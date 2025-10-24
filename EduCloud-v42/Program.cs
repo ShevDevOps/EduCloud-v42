@@ -1,7 +1,16 @@
+using EduCloud_v42.Models;
+using Microsoft.EntityFrameworkCore;
+using System;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+string connection = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<LearningDbContext>(options => options.UseSqlite(connection));
 builder.Services.AddControllersWithViews();
+
+
 
 var app = builder.Build();
 
