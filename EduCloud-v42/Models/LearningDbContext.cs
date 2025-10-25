@@ -84,7 +84,7 @@ namespace EduCloud_v42.Models
             modelBuilder.Entity<CourseFile>(entity =>
             {
                 entity.ToTable("Course Files");
-                entity.HasKey(e => e.UniqueID); // PK
+                entity.HasKey(e => e.ID); // PK
                 entity.Property(e => e.Path).HasColumnName("path");
 
                 // Зв'язок з CourseElement (Один CourseElement має багато файлів)

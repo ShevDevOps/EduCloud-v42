@@ -2,7 +2,7 @@
 {
     public class CourseFile
     {
-        public int UniqueID { get; set; } // PK
+        public int ID { get; set; } // PK
         public string Path { get; set; }
 
         // Зовнішній ключ до Course Element
