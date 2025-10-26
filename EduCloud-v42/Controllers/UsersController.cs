@@ -5,7 +5,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,6 +21,42 @@ namespace EduCloud_v42.Controllers
         public UsersController(LearningDbContext context)
         {
             _context = context;
+        }
+
+        public class UniqueAttribute : ValidationAttribute
+        {
+            public string PropertyName { get; }
+
+            public UniqueAttribute(string propertyName)
+            {
+                PropertyName = propertyName;
+            }
+
+            //перевірка унікальності текстових полів
+            protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
+            {
+                if (value == null)
+                    return ValidationResult.Success;
+
+                var _context = (LearningDbContext)validationContext.GetService(typeof(LearningDbContext))!;
+                if (_context == null)
+                    throw new InvalidOperationException("DbContext not found in ValidationContext.");
+
+                var dbSet = _context.Set<User>();
+
+                // отримуємо ID редагованого користувача з ViewModel
+                var objectInstance = validationContext.ObjectInstance;
+                var idProperty = objectInstance.GetType().GetProperty("ID");
+                int currentId = idProperty != null ? (int)idProperty.GetValue(objectInstance)! : 0;
+
+                // перевірка унікальності з виключенням поточного запису
+                bool exists = dbSet.Any(u => EF.Property<string>(u, PropertyName) == (string)value && u.ID != currentId);
+
+                if (exists)
+                    return new ValidationResult(ErrorMessage ?? $"{PropertyName} already exists.");
+
+                return ValidationResult.Success;
+            }
         }
 
         // GET: Users
@@ -84,49 +122,66 @@ namespace EduCloud_v42.Controllers
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var user = await _context.Users.FindAsync(id);
             if (user == null)
-            {
                 return NotFound();
-            }
-            return View(user);
+
+            var vm = new UserEditViewModel
+            {
+                ID = user.ID,
+                Username = user.Username,
+                FullName = user.FullName,
+                Email = user.Email,
+                Phone = user.Phone,
+                Role = user.Role
+            };
+
+            return View(vm);
         }
 
         // POST: Users/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Name,Role")] User user)
+        public async Task<IActionResult> Edit(UserEditViewModel viewModel)
         {
-            if (id != user.ID)
-            {
+            if (!ModelState.IsValid)
+                return View(viewModel);
+
+            var user = await _context.Users.FindAsync(viewModel.ID);
+            if (user == null)
                 return NotFound();
+
+            // Оновлюємо дані
+            user.Username = viewModel.Username;
+            user.FullName = viewModel.FullName;
+            user.Email = viewModel.Email;
+            user.Phone = viewModel.Phone;
+            user.Role = viewModel.Role;
+
+            // Новий пароль
+            if (!string.IsNullOrEmpty(viewModel.NewPassword))
+            {
+                using var sha256 = SHA256.Create();
+                var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(viewModel.NewPassword));
+                user.PasswordHash = BitConverter.ToString(hashedBytes).Replace("-", "").ToLowerInvariant();
             }
 
-            if (ModelState.IsValid)
+            try
             {
-                try
-                {
-                    _context.Update(user);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!_context.Users.Any(e => e.ID == user.ID))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                _context.Update(user);
+                await _context.SaveChangesAsync();
             }
-            return View(user);
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!_context.Users.Any(e => e.ID == viewModel.ID))
+                    return NotFound();
+                else
+                    throw;
+            }
+
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Users/Delete/5
@@ -161,5 +216,7 @@ namespace EduCloud_v42.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
+        
     }
 }
