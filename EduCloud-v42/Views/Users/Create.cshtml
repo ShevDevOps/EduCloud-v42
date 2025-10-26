@@ -1,4 +1,5 @@
-﻿@model EduCloud_v42.Models.User
+﻿@* Змініть тип моделі *@
+@model EduCloud_v42.ViewModels.UserCreateViewModel
 
 @{
     ViewData["Title"] = "Create User";
@@ -37,10 +38,18 @@
             </div>
 
             <div class="form-group">
-                <label for="Password" class="control-label">Password</label>
-                <input id="Password" name="Password" class="form-control" type="password" required />
-                <span class="text-danger"></span>
+                @* Тепер прив'язка йде до моделі ViewModel *@
+                <label asp-for="Password" class="control-label"></label>
+                <input asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
             </div>
+
+            @* Додатково: поле для підтвердження пароля *@
+            @* <div class="form-group">
+                <label asp-for="ConfirmPassword" class="control-label"></label>
+                <input asp-for="ConfirmPassword" class="form-control" /> 
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div> *@
 
             <div class="form-group">
                 <label asp-for="Role" class="control-label"></label>

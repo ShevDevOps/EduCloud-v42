@@ -1,11 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using EduCloud_v42.Models;
+using EduCloud_v42.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using EduCloud_v42.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace EduCloud_v42.Controllers
 {
@@ -45,21 +48,36 @@ namespace EduCloud_v42.Controllers
         // GET: Users/Create
         public IActionResult Create()
         {
-            return View();
+            return View(new UserCreateViewModel());
         }
 
         // POST: Users/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,Name,Role")] User user)
+        public async Task<IActionResult> Create(UserCreateViewModel viewModel)
         {
             if (ModelState.IsValid)
             {
+                var user = new User
+                {
+                    Username = viewModel.Username,
+                    FullName = viewModel.FullName,
+                    Email = viewModel.Email,
+                    Phone = viewModel.Phone,
+                    Role = viewModel.Role
+                };
+
+                using (var sha256 = SHA256.Create())
+                {
+                    var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(viewModel.Password));
+                    user.PasswordHash = BitConverter.ToString(hashedBytes).Replace("-", "").ToLowerInvariant();
+                }
+
                 _context.Add(user);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(user);
+            return View(viewModel);
         }
 
         // GET: Users/Edit/5
