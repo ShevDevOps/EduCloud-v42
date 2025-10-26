@@ -11,7 +11,6 @@ builder.Services.AddDbContext<LearningDbContext>(options => options.UseSqlite(co
 builder.Services.AddControllersWithViews();
 
 
-
 var app = builder.Build();
 
 
