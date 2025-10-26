@@ -7,6 +7,12 @@
     <RootNamespace>EduCloud_v42</RootNamespace>
 	  <PreserveCompilationContext>true</PreserveCompilationContext>
 	  <CopyRefAssembliesToPublishDirectory>true</CopyRefAssembliesToPublishDirectory>
+
+	  <PackAsTool>true</PackAsTool>
+	  <ToolCommandName>educloud</ToolCommandName>
+	  <PackageVersion>1.0.0-lab2</PackageVersion>
+
+	  <IsPackable>true</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
