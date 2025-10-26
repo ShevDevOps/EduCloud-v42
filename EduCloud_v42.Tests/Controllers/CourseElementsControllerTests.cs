@@ -91,8 +91,8 @@ namespace EduCloud_v42.Tests.Controllers
 
             // Assert
             var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
-            Assert.Equal("Index", redirectToActionResult.ActionName);
-            Assert.Equal(1, redirectToActionResult.RouteValues["courseId"]);
+            Assert.Equal("Details", redirectToActionResult.ActionName);
+            Assert.Equal(1, redirectToActionResult.RouteValues["id"]);
             Assert.Equal(3, _context.CourseElements.Count());
         }
 
