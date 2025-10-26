@@ -1,0 +1,39 @@
+﻿@model IEnumerable<EduCloud_v42.Models.UserTask>
+
+@{
+    ViewData["Title"] = "Submissions";
+    var taskName = ViewData["TaskName"];
+    var taskId = ViewData["TaskId"];
+}
+
+<h1>Submissions for: @taskName</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.User)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Mark)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.User.Username)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Mark)
+                </td>
+                <td>
+                    <a asp-action="Grade" asp-route-taskId="@item.TaskId" asp-route-userId="@item.UserId">Grade</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
