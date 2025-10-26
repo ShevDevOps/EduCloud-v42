@@ -1,0 +1,49 @@
+﻿@model IEnumerable<EduCloud_v42.Models.UserCourse>
+
+@{
+    ViewData["Title"] = "Enrollments";
+    var courseName = ViewData["CourseName"];
+    var courseId = ViewData["CourseId"];
+}
+
+<h1>Users in course: @courseName</h1>
+
+<p>
+    <a asp-action="EnrollUser" asp-route-courseId="@courseId">Enroll New User</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.User)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Role)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.User.Username)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Role)
+                </td>
+                <td>
+                    <form asp-action="Unenroll" asp-route-userId="@item.UserId" asp-route-courseId="@item.CourseId" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="submit" value="Unenroll" class="btn btn-sm btn-danger" />
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<div>
+    <a asp-controller="Courses" asp-action="Index">Back to Courses</a>
+</div>
