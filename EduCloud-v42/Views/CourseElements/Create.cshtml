@@ -10,10 +10,10 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-action="Create" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-            <input type="hidden" asp-for="CourseId" value="@courseId" />
+            <input type="hidden" asp-for="CourseId" />
 
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
@@ -38,7 +38,7 @@
 </div>
 
 <div>
-    <a asp-action="Index" asp-route-courseId="@courseId">Back to List</a>
+    <a asp-controller="Courses" asp-action="Details" asp-route-id="@courseId">Back to Course</a>
 </div>
 
 @section Scripts {

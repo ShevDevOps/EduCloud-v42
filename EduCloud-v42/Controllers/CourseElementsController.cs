@@ -69,12 +69,12 @@ namespace EduCloud_v42.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Name,Description,Type,CourseId")] CourseElement courseElement)
         {
-            if (ModelState.IsValid)
+            if (ModelState.IsValid) 
             {
                 _context.Add(courseElement);
                 await _context.SaveChangesAsync();
-                // Повертаємось до списку елементів цього ж курсу
-                return RedirectToAction(nameof(Index), new { courseId = courseElement.CourseId });
+                // Повертаємось до Курсу
+                return RedirectToAction("Details", "Courses", new { id = courseElement.CourseId });
             }
             return View(courseElement);
         }

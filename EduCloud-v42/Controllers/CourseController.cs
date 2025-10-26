@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using EduCloud_v42.Models;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace EduCloud_v42.Controllers
 {
@@ -33,7 +34,9 @@ namespace EduCloud_v42.Controllers
             }
 
             var course = await _context.Courses
-                .FirstOrDefaultAsync(m => m.ID == id);
+                .Include(c => c.CourseElements) // <-- підвантажуємо пов’язані елементи
+                .ThenInclude(e => e.CourseFiles) // (опціонально — файли)
+                .FirstOrDefaultAsync(c => c.ID == id);
             if (course == null)
             {
                 return NotFound();

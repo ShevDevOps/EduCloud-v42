@@ -25,6 +25,19 @@
     </dl>
 </div>
 <div>
-    @* <a asp-action="Edit" asp-route-id="@Model.ID">Edit</a> | *@
-    <a asp-action="Index">Back to list</a>
+    <a asp-action="Edit" asp-route-id="@Model.ID">Edit</a> |
+    <a asp-action="Index">Back to list</a>|
+    <a asp-action="Delete" asp-route-id="@Model.ID">Delete</a>|
+    <a asp-controller="CourseElements" asp-action="Create" asp-route-courseId="@Model.ID">Add Task</a>
 </div>
+<h3>Елементи курсу:</h3>
+<ul>
+    @foreach (var el in Model.CourseElements)
+    {
+        <li>
+            @el.Name (@el.Type)|<a asp-controller="CourseElements" asp-action="Details" asp-route-id="@el.ID">Details</a>|
+            <a asp-controller="CourseElements" asp-action="Edit" asp-route-id="@el.ID">Edit</a>|
+            <a asp-controller="CourseElements" asp-controller="Courses" asp-action="Delete" asp-route-id="@el.ID">Delete</a>
+        </li>
+    }
+</ul>
