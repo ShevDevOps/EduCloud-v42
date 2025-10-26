@@ -1,0 +1,35 @@
+﻿@model EduCloud_v42.Models.UserTask
+
+@{
+    ViewData["Title"] = "Grade Submission";
+}
+
+<h1>Grade Submission</h1>
+
+<h4>Task: @Model.Task.Name</h4>
+<h4>Student: @Model.User.Username</h4>
+<hr />
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Grade">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="UserId" />
+            <input type="hidden" asp-for="TaskId" />
+
+            <div class="form-group">
+                <label asp-for="Mark" class="control-label"></label>
+                <input asp-for="Mark" class="form-control" />
+                <span asp-validation-for="Mark" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mt-3">
+                <input type="submit" value="Save Grade" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="ViewSubmissions" asp-route-taskId="@Model.TaskId">Back to Submissions</a>
+</div>

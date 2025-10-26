@@ -14,10 +14,10 @@
 
         // Зовнішній ключ до Course
         public int CourseId { get; set; }
-        public virtual Course Course { get; set; }
+        public virtual Course? Course { get; set; }
 
         // Навігаційні властивості
-        public virtual ICollection<CourseFile> CourseFiles { get; set; }
-        public virtual ICollection<UserTask> UserTasks { get; set; }
+        public virtual List<CourseFile> CourseFiles { get; set; } = new();
+        public virtual List<UserTask> UserTasks { get; set; } = new();
     }
 }

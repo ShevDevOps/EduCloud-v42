@@ -1,11 +1,21 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using System.IO;
+using System;
 
 namespace EduCloud_v42.Models
 {
     public class LearningDbContext : DbContext
     {
-        // Конструктор для ін'єкції залежностей
-        public LearningDbContext(DbContextOptions<LearningDbContext> options) : base(options) { }
+        private readonly IWebHostEnvironment _webHostEnvironment;
+
+        // Конструктор для ін'єкції залежностей, включаючи IWebHostEnvironment
+        public LearningDbContext(DbContextOptions<LearningDbContext> options, IWebHostEnvironment webHostEnvironment)
+            : base(options)
+        {
+            _webHostEnvironment = webHostEnvironment;
+        }
 
         // Набори DbSet для кожної таблиці
         public DbSet<User> Users { get; set; }
@@ -16,6 +26,182 @@ namespace EduCloud_v42.Models
         public DbSet<UserTask> UserTasks { get; set; }
         public DbSet<TaskFile> TaskFiles { get; set; }
 
+        #region CourseFile Management (Synchronous)
+
+        public CourseFile AddCourseFile(IFormFile file, int courseElementId)
+        {
+            var relativePath = SaveFile(file, "course_files");
+            if (string.IsNullOrEmpty(relativePath))
+            {
+                return null; // Помилка збереження файлу
+            }
+
+            var courseFile = new CourseFile
+            {
+                Path = relativePath,
+                CourseElementId = courseElementId
+            };
+
+            CourseFiles.Add(courseFile);
+            SaveChanges();
+            return courseFile;
+        }
+
+        public CourseFile UpdateCourseFile(int courseFileId, IFormFile newFile)
+        {
+            var courseFile = CourseFiles.Find(courseFileId);
+            if (courseFile == null)
+            {
+                return null; // Запис не знайдено
+            }
+
+            // Видаляємо старий файл
+            DeleteFile(courseFile.Path);
+
+            // Зберігаємо новий файл і оновлюємо шлях
+            var newRelativePath = SaveFile(newFile, "course_files");
+            if (string.IsNullOrEmpty(newRelativePath))
+            {
+                return null; // Помилка збереження нового файлу
+            }
+
+            courseFile.Path = newRelativePath;
+            CourseFiles.Update(courseFile);
+            SaveChanges();
+
+            return courseFile;
+        }
+
+        public bool DeleteCourseFile(int courseFileId)
+        {
+            var courseFile = CourseFiles.Find(courseFileId);
+            if (courseFile == null)
+            {
+                return false;
+            }
+
+            // Видаляємо фізичний файл
+            DeleteFile(courseFile.Path);
+
+            // Видаляємо запис з БД
+            CourseFiles.Remove(courseFile);
+            SaveChanges();
+
+            return true;
+        }
+
+        #endregion
+
+        #region TaskFile Management (Synchronous)
+
+        public TaskFile AddTaskFile(IFormFile file, int userId, int taskId)
+        {
+            var relativePath = SaveFile(file, "task_files");
+            if (string.IsNullOrEmpty(relativePath))
+            {
+                return null;
+            }
+
+            var taskFile = new TaskFile
+            {
+                Path = relativePath,
+                UserId = userId,
+                TaskId = taskId
+            };
+
+            TaskFiles.Add(taskFile);
+            SaveChanges();
+            return taskFile;
+        }
+
+        public TaskFile UpdateTaskFile(int taskFileId, IFormFile newFile)
+        {
+            var taskFile = TaskFiles.Find(taskFileId);
+            if (taskFile == null)
+            {
+                return null;
+            }
+
+            DeleteFile(taskFile.Path);
+
+            var newRelativePath = SaveFile(newFile, "task_files");
+            if (string.IsNullOrEmpty(newRelativePath))
+            {
+                return null;
+            }
+
+            taskFile.Path = newRelativePath;
+            TaskFiles.Update(taskFile);
+            SaveChanges();
+
+            return taskFile;
+        }
+
+        public bool DeleteTaskFile(int taskFileId)
+        {
+            var taskFile = TaskFiles.Find(taskFileId);
+            if (taskFile == null)
+            {
+                return false;
+            }
+
+            DeleteFile(taskFile.Path);
+
+            TaskFiles.Remove(taskFile);
+            SaveChanges();
+
+            return true;
+        }
+
+        #endregion
+
+        #region Private File Helpers
+
+        private string SaveFile(IFormFile file, string subfolder)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return null;
+            }
+
+            // Шлях до папки 'wwwroot/uploads/subfolder'
+            var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", subfolder);
+            if (!Directory.Exists(uploadsFolder))
+            {
+                Directory.CreateDirectory(uploadsFolder);
+            }
+
+            // Створення унікального імені файлу для уникнення конфліктів
+            var uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(file.FileName);
+            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                file.CopyTo(stream);
+            }
+
+            // Повертаємо відносний шлях для збереження в БД
+            return Path.Combine("uploads", subfolder, uniqueFileName).Replace('\\', '/');
+        }
+
+        private void DeleteFile(string relativePath)
+        {
+            if (string.IsNullOrEmpty(relativePath))
+            {
+                return;
+            }
+            // Видаляємо початковий слеш, якщо він є, щоб Path.Combine працював коректно
+            relativePath = relativePath.TrimStart('/');
+            var fullPath = Path.Combine(_webHostEnvironment.WebRootPath, relativePath);
+
+            if (File.Exists(fullPath))
+            {
+                File.Delete(fullPath);
+            }
+        }
+
+        #endregion
+
         // Метод для конфігурування моделей (Fluent API)
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -24,8 +210,31 @@ namespace EduCloud_v42.Models
             // --- Налаштування таблиці Users ---
             modelBuilder.Entity<User>(entity =>
             {
-                entity.ToTable("Users"); // Явно вказуємо ім'я таблиці
+                entity.ToTable("Users");
                 entity.HasKey(e => e.ID);
+
+                // Налаштування Username
+                entity.Property(e => e.Username)
+                      .IsRequired()
+                      .HasMaxLength(50);
+                entity.HasIndex(e => e.Username) 
+                      .IsUnique();
+
+                // Налаштування FullName
+                entity.Property(e => e.FullName)
+                      .IsRequired()
+                      .HasMaxLength(500);
+
+                entity.Property(e => e.Email)
+                      .IsRequired();
+                entity.HasIndex(e => e.Email)
+                      .IsUnique();
+
+                entity.Property(e => e.Phone).IsRequired(false);
+
+                // Налаштування PasswordHash
+                entity.Property(e => e.PasswordHash)
+                      .IsRequired();
 
                 // Зберігаємо Enum як рядок ("Admin", "User")
                 entity.Property(e => e.Role).HasConversion<string>();
@@ -36,6 +245,8 @@ namespace EduCloud_v42.Models
             {
                 entity.ToTable("Course");
                 entity.HasKey(e => e.ID);
+                entity.Property(e => e.Name).IsRequired();
+                entity.Property(e => e.Description).IsRequired();
             });
 
             // --- Налаштування "Users to Courses" (зв'язок M-M з дод. полем) ---
@@ -65,14 +276,14 @@ namespace EduCloud_v42.Models
                 entity.ToTable("Course Element");
                 entity.HasKey(e => e.ID);
 
+                // Мапуємо властивість CourseId на стовпець 'course'
+                entity.Property(e => e.CourseId).HasColumnName("course");
+
                 // Зв'язок з Course (Один Course має багато CourseElements)
                 entity.HasOne(ce => ce.Course)
                       .WithMany(c => c.CourseElements)
-                      .HasForeignKey("course") // Використовуємо ім'я стовпця 'course' з діаграми
+                      .HasForeignKey(ce => ce.CourseId)// Використовуємо ім'я стовпця 'course' з діаграми
                       .HasPrincipalKey(c => c.ID);
-
-                // Мапуємо властивість CourseId на стовпець 'course'
-                entity.Property(e => e.CourseId).HasColumnName("course");
 
                 // Зберігаємо Enum як рядок
                 entity.Property(e => e.Type)

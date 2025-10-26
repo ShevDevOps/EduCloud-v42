@@ -1,0 +1,36 @@
+﻿@model EduCloud_v42.Models.UserTask
+
+@{
+    ViewData["Title"] = "Submit Work";
+    var taskName = ViewData["TaskName"];
+    var userName = ViewData["UserName"];
+}
+
+<h1>Submit work for @taskName</h1>
+<h4>Student: @userName</h4>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Submit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <input type="hidden" asp-for="UserId" />
+            <input type="hidden" asp-for="TaskId" />
+
+            <div class="alert alert-info">
+                Your current status is: <strong>@Model.Mark</strong>
+            </div>
+
+            <div class="form-group">
+                <p>
+                    (Here would be a file upload button for TaskFile)
+                </p>
+            </div>
+
+            <div class="form-group mt-3">
+                <input type="submit" value="Submit" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>

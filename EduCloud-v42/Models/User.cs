@@ -1,4 +1,7 @@
-﻿namespace EduCloud_v42.Models
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace EduCloud_v42.Models
 {
     public enum UserRole
     {
@@ -8,7 +11,19 @@
     public class User
     {
         public int ID { get; set; }
-        public string Name { get; set; }
+        [Required]
+        [StringLength(50)]
+        public string Username { get; set; } = string.Empty;
+        [Required]
+        [StringLength(500)]
+        public string FullName { get; set; } = string.Empty;
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; } = string.Empty;
+        [Phone]
+        public string? Phone { get; set; }
+        [Required]
+        public string PasswordHash { get; set; } = string.Empty;
         public UserRole Role { get; set; }
 
         // Навігаційні властивості (для зв'язків)
