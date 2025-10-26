@@ -194,20 +194,19 @@ namespace EduCloud_v42.Tests.Controllers
             var userToUpdate = await _context.Users.FindAsync(2);
             Assert.NotNull(userToUpdate);
 
-            var formData = new User
+            var formData = new UserEditViewModel
             {
                 ID = 2,
                 Username = "UpdatedUser",
                 FullName = "Updated FullName",
                 Email = "updated@example.com",
                 Phone = "987654321",
-                Role = UserRole.Admin,
-                PasswordHash = userToUpdate.PasswordHash
+                Role = UserRole.Admin
             };
             _context.Entry(userToUpdate).State = EntityState.Detached;
 
             // Act
-            var result = await _controller.Edit(2, formData);
+            var result = await _controller.Edit(formData);
 
             // Assert
             var redirectToActionResult = Assert.IsType<RedirectToActionResult>(result);
