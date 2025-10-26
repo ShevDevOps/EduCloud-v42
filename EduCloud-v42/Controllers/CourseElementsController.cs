@@ -69,7 +69,7 @@ namespace EduCloud_v42.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Name,Description,Type,CourseId")] CourseElement courseElement)
         {
-            if (ModelState.IsValid)
+            if (ModelState.IsValid) 
             {
                 _context.Add(courseElement);
                 await _context.SaveChangesAsync();
