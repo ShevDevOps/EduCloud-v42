@@ -5,14 +5,22 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Linq;
-
+using System.Security.Cryptography;
+using System.Text;
 
 namespace EduCloud_v42.Tests.Integration
 {
     public class CustomWebApplicationFactory : WebApplicationFactory<Program>
     {
         private SqliteConnection? _connection;
-
+        private string HashPassword(string password)
+        {
+            using (var sha256 = SHA256.Create())
+            {
+                var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+                return BitConverter.ToString(hashedBytes).Replace("-", "").ToLowerInvariant();
+            }
+        }
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             builder.ConfigureServices(services =>
@@ -31,34 +39,35 @@ namespace EduCloud_v42.Tests.Integration
                     options.UseSqlite(_connection);
                 });
 
-                var sp = services.BuildServiceProvider();
-                using (var scope = sp.CreateScope())
-                {
-                    var db = scope.ServiceProvider.GetRequiredService<LearningDbContext>();
-                    db.Database.EnsureCreated();
-                }
             });
         }
+
         public void InitializeDbForTests()
         {
-            // Створюємо 'scope' для отримання сервісів
             using (var scope = this.Services.CreateScope())
             {
                 var db = scope.ServiceProvider.GetRequiredService<LearningDbContext>();
 
-                // Перестворюємо базу даних кожного разу для чистого тесту
                 db.Database.EnsureDeleted();
                 db.Database.EnsureCreated();
 
-                // --- Додаємо тестові дані ---
 
-                // 1. Користувачі
+                // 1. Користувачі з усіма полями
                 var users = new List<User>
                 {
-                    new User { ID = 1, Username = "Admin User", Role = UserRole.Admin },
-                    new User { ID = 2, Username = "Test User", Role = UserRole.User }
+                    new User {
+                        ID = 1, Username = "AdminUser", FullName = "Admin FullName",
+                        Email = "admin@example.com", PasswordHash = HashPassword("adminpass"),
+                        Role = UserRole.Admin, Phone = "111222333"
+                    },
+                    new User {
+                        ID = 2, Username = "TestUser", FullName = "Test FullName",
+                        Email = "test@example.com", PasswordHash = HashPassword("testpass"),
+                        Role = UserRole.User, Phone = "444555666"
+                    }
                 };
                 db.Users.AddRange(users);
+                db.SaveChanges();
 
                 // 2. Курси
                 var courses = new List<Course>
@@ -67,6 +76,7 @@ namespace EduCloud_v42.Tests.Integration
                     new Course { ID = 2, Name = "Test Course 2", Description = "Desc 2" }
                 };
                 db.Courses.AddRange(courses);
+                db.SaveChanges();
 
                 // 3. Елементи курсу (ID=2 є 'Task')
                 var elements = new List<CourseElement>
@@ -75,6 +85,7 @@ namespace EduCloud_v42.Tests.Integration
                     new CourseElement { ID = 2, Name = "Task 1", Description = "Integration test task", Type = CourseElementType.Task, CourseId = 1 }
                 };
                 db.CourseElements.AddRange(elements);
+                db.SaveChanges();
 
                 // 4. Запис на курс
                 var enrollment = new UserCourse { UserId = 2, CourseId = 1, Role = CourseRole.Student };
@@ -84,7 +95,6 @@ namespace EduCloud_v42.Tests.Integration
                 var submission = new UserTask { UserId = 2, TaskId = 2, Mark = "Submitted" };
                 db.UserTasks.Add(submission);
 
-                // Зберігаємо всі зміни
                 db.SaveChanges();
             }
         }
