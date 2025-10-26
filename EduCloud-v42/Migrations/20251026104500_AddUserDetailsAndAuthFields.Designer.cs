@@ -2,6 +2,7 @@
 using EduCloud_v42.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -9,9 +10,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EduCloud_v42.Migrations
 {
     [DbContext(typeof(LearningDbContext))]
-    partial class LearningDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251026104500_AddUserDetailsAndAuthFields")]
+    partial class AddUserDetailsAndAuthFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.10");
