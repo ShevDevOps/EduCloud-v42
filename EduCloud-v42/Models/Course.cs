@@ -1,4 +1,6 @@
-﻿namespace EduCloud_v42.Models
+﻿using System.Collections.Generic;
+
+namespace EduCloud_v42.Models
 {
     public class Course
     {
@@ -7,7 +9,7 @@
         public string Description { get; set; }
 
         // Навігаційні властивості
-        public virtual ICollection<UserCourse> UserCourses { get; set; }
-        public virtual ICollection<CourseElement> CourseElements { get; set; }
+        public virtual ICollection<UserCourse> UserCourses { get; set; } = new List<UserCourse>();
+        public virtual ICollection<CourseElement> CourseElements { get; set; } = new List<CourseElement>();
     }
 }

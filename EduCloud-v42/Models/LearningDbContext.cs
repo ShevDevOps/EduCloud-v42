@@ -24,8 +24,31 @@ namespace EduCloud_v42.Models
             // --- Налаштування таблиці Users ---
             modelBuilder.Entity<User>(entity =>
             {
-                entity.ToTable("Users"); // Явно вказуємо ім'я таблиці
+                entity.ToTable("Users");
                 entity.HasKey(e => e.ID);
+
+                // Налаштування Username
+                entity.Property(e => e.Username)
+                      .IsRequired()
+                      .HasMaxLength(50);
+                entity.HasIndex(e => e.Username) 
+                      .IsUnique();
+
+                // Налаштування FullName
+                entity.Property(e => e.FullName)
+                      .IsRequired()
+                      .HasMaxLength(500);
+
+                entity.Property(e => e.Email)
+                      .IsRequired();
+                entity.HasIndex(e => e.Email)
+                      .IsUnique();
+
+                entity.Property(e => e.Phone).IsRequired(false);
+
+                // Налаштування PasswordHash
+                entity.Property(e => e.PasswordHash)
+                      .IsRequired();
 
                 // Зберігаємо Enum як рядок ("Admin", "User")
                 entity.Property(e => e.Role).HasConversion<string>();
@@ -36,6 +59,8 @@ namespace EduCloud_v42.Models
             {
                 entity.ToTable("Course");
                 entity.HasKey(e => e.ID);
+                entity.Property(e => e.Name).IsRequired();
+                entity.Property(e => e.Description).IsRequired();
             });
 
             // --- Налаштування "Users to Courses" (зв'язок M-M з дод. полем) ---
@@ -65,14 +90,14 @@ namespace EduCloud_v42.Models
                 entity.ToTable("Course Element");
                 entity.HasKey(e => e.ID);
 
+                // Мапуємо властивість CourseId на стовпець 'course'
+                entity.Property(e => e.CourseId).HasColumnName("course");
+
                 // Зв'язок з Course (Один Course має багато CourseElements)
                 entity.HasOne(ce => ce.Course)
                       .WithMany(c => c.CourseElements)
-                      .HasForeignKey("course") // Використовуємо ім'я стовпця 'course' з діаграми
+                      .HasForeignKey(ce => ce.CourseId)// Використовуємо ім'я стовпця 'course' з діаграми
                       .HasPrincipalKey(c => c.ID);
-
-                // Мапуємо властивість CourseId на стовпець 'course'
-                entity.Property(e => e.CourseId).HasColumnName("course");
 
                 // Зберігаємо Enum як рядок
                 entity.Property(e => e.Type)
