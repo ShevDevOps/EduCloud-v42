@@ -1,11 +1,21 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using System.IO;
+using System;
 
 namespace EduCloud_v42.Models
 {
     public class LearningDbContext : DbContext
     {
-        // Конструктор для ін'єкції залежностей
-        public LearningDbContext(DbContextOptions<LearningDbContext> options) : base(options) { }
+        private readonly IWebHostEnvironment _webHostEnvironment;
+
+        // Конструктор для ін'єкції залежностей, включаючи IWebHostEnvironment
+        public LearningDbContext(DbContextOptions<LearningDbContext> options, IWebHostEnvironment webHostEnvironment)
+            : base(options)
+        {
+            _webHostEnvironment = webHostEnvironment;
+        }
 
         // Набори DbSet для кожної таблиці
         public DbSet<User> Users { get; set; }
@@ -15,6 +25,182 @@ namespace EduCloud_v42.Models
         public DbSet<CourseFile> CourseFiles { get; set; }
         public DbSet<UserTask> UserTasks { get; set; }
         public DbSet<TaskFile> TaskFiles { get; set; }
+
+        #region CourseFile Management (Synchronous)
+
+        public CourseFile AddCourseFile(IFormFile file, int courseElementId)
+        {
+            var relativePath = SaveFile(file, "course_files");
+            if (string.IsNullOrEmpty(relativePath))
+            {
+                return null; // Помилка збереження файлу
+            }
+
+            var courseFile = new CourseFile
+            {
+                Path = relativePath,
+                CourseElementId = courseElementId
+            };
+
+            CourseFiles.Add(courseFile);
+            SaveChanges();
+            return courseFile;
+        }
+
+        public CourseFile UpdateCourseFile(int courseFileId, IFormFile newFile)
+        {
+            var courseFile = CourseFiles.Find(courseFileId);
+            if (courseFile == null)
+            {
+                return null; // Запис не знайдено
+            }
+
+            // Видаляємо старий файл
+            DeleteFile(courseFile.Path);
+
+            // Зберігаємо новий файл і оновлюємо шлях
+            var newRelativePath = SaveFile(newFile, "course_files");
+            if (string.IsNullOrEmpty(newRelativePath))
+            {
+                return null; // Помилка збереження нового файлу
+            }
+
+            courseFile.Path = newRelativePath;
+            CourseFiles.Update(courseFile);
+            SaveChanges();
+
+            return courseFile;
+        }
+
+        public bool DeleteCourseFile(int courseFileId)
+        {
+            var courseFile = CourseFiles.Find(courseFileId);
+            if (courseFile == null)
+            {
+                return false;
+            }
+
+            // Видаляємо фізичний файл
+            DeleteFile(courseFile.Path);
+
+            // Видаляємо запис з БД
+            CourseFiles.Remove(courseFile);
+            SaveChanges();
+
+            return true;
+        }
+
+        #endregion
+
+        #region TaskFile Management (Synchronous)
+
+        public TaskFile AddTaskFile(IFormFile file, int userId, int taskId)
+        {
+            var relativePath = SaveFile(file, "task_files");
+            if (string.IsNullOrEmpty(relativePath))
+            {
+                return null;
+            }
+
+            var taskFile = new TaskFile
+            {
+                Path = relativePath,
+                UserId = userId,
+                TaskId = taskId
+            };
+
+            TaskFiles.Add(taskFile);
+            SaveChanges();
+            return taskFile;
+        }
+
+        public TaskFile UpdateTaskFile(int taskFileId, IFormFile newFile)
+        {
+            var taskFile = TaskFiles.Find(taskFileId);
+            if (taskFile == null)
+            {
+                return null;
+            }
+
+            DeleteFile(taskFile.Path);
+
+            var newRelativePath = SaveFile(newFile, "task_files");
+            if (string.IsNullOrEmpty(newRelativePath))
+            {
+                return null;
+            }
+
+            taskFile.Path = newRelativePath;
+            TaskFiles.Update(taskFile);
+            SaveChanges();
+
+            return taskFile;
+        }
+
+        public bool DeleteTaskFile(int taskFileId)
+        {
+            var taskFile = TaskFiles.Find(taskFileId);
+            if (taskFile == null)
+            {
+                return false;
+            }
+
+            DeleteFile(taskFile.Path);
+
+            TaskFiles.Remove(taskFile);
+            SaveChanges();
+
+            return true;
+        }
+
+        #endregion
+
+        #region Private File Helpers
+
+        private string SaveFile(IFormFile file, string subfolder)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return null;
+            }
+
+            // Шлях до папки 'wwwroot/uploads/subfolder'
+            var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", subfolder);
+            if (!Directory.Exists(uploadsFolder))
+            {
+                Directory.CreateDirectory(uploadsFolder);
+            }
+
+            // Створення унікального імені файлу для уникнення конфліктів
+            var uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(file.FileName);
+            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                file.CopyTo(stream);
+            }
+
+            // Повертаємо відносний шлях для збереження в БД
+            return Path.Combine("uploads", subfolder, uniqueFileName).Replace('\\', '/');
+        }
+
+        private void DeleteFile(string relativePath)
+        {
+            if (string.IsNullOrEmpty(relativePath))
+            {
+                return;
+            }
+            // Видаляємо початковий слеш, якщо він є, щоб Path.Combine працював коректно
+            relativePath = relativePath.TrimStart('/');
+            var fullPath = Path.Combine(_webHostEnvironment.WebRootPath, relativePath);
+
+            if (File.Exists(fullPath))
+            {
+                File.Delete(fullPath);
+            }
+        }
+
+        #endregion
 
         // Метод для конфігурування моделей (Fluent API)
         protected override void OnModelCreating(ModelBuilder modelBuilder)
