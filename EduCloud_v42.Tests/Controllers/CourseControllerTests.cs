@@ -22,7 +22,7 @@ namespace EduCloud_v42.Tests.Controllers
             _options = new DbContextOptionsBuilder<LearningDbContext>()
                 .UseInMemoryDatabase(databaseName: System.Guid.NewGuid().ToString()) // Унікальна база для кожного тесту
                 .Options;
-            _context = new LearningDbContext(_options);
+            _context = new LearningDbContext(_options, null);
         }
 
         private void SeedData()

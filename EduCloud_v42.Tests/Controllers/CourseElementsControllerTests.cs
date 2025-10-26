@@ -21,7 +21,7 @@ namespace EduCloud_v42.Tests.Controllers
             _options = new DbContextOptionsBuilder<LearningDbContext>()
                 .UseInMemoryDatabase(databaseName: System.Guid.NewGuid().ToString())
                 .Options;
-            _context = new LearningDbContext(_options);
+            _context = new LearningDbContext(_options, null);
         }
 
         private void SeedData()
