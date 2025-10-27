@@ -57,11 +57,11 @@ namespace EduCloud_v42.Controllers
         }
 
         // GET: CourseElements/Create?courseId=5
-        public IActionResult Create(int courseId)
+        public IActionResult Create(int id)
         {
             // Передаємо CourseId у View, щоб при POST-запиті він був включений у форму
-            ViewData["CourseId"] = courseId;
-            return View(new CourseElement { CourseId = courseId });
+            ViewData["CourseId"] = id;
+            return View(new CourseElement { CourseId = id });
         }
 
         // POST: CourseElements/Create
