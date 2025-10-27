@@ -10,7 +10,7 @@
 
 	  <PackAsTool>true</PackAsTool>
 	  <ToolCommandName>educloud</ToolCommandName>
-	  <PackageVersion>1.0.0-lab2</PackageVersion>
+	  <PackageVersion>1.0.3-lab2</PackageVersion>
 
 	  <IsPackable>true</IsPackable>
   </PropertyGroup>
@@ -22,5 +22,5 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-
+	
 </Project>

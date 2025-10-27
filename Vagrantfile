@@ -29,7 +29,7 @@ Vagrant.configure("2") do |config|
       /home/vagrant/.dotnet/dotnet nuget add source "http://192.168.33.1:5555/v3/index.json" -n "MyBaGet"
 
       echo "--- Встановлення EduCloud-v42 з BaGet ---"
-      /home/vagrant/.dotnet/dotnet tool install --global EduCloud-v42 --version 1.0.0-lab2
+      /home/vagrant/.dotnet/dotnet tool install --global EduCloud-v42 --version 1.0.2-lab2
       
       echo "--- Встановлення завершено! ---"
     SHELL
@@ -47,18 +47,34 @@ Vagrant.configure("2") do |config|
     windows.vm.network "forwarded_port", guest: 5000, host: 5001
 
     windows.vm.provision "shell", inline: <<-PSHELL
-      # (решта вашого скрипту без змін)
       Write-Host "--- Встановлення .NET 8 SDK на Windows ---"
       Invoke-WebRequest -Uri https://dot.net/v1/dotnet-install.ps1 -OutFile .\\dotnet-install.ps1
       .\\dotnet-install.ps1 -Channel 8.0
-      $env:PATH = "$env:PATH;$env:USERPROFILE\\.dotnet;$env:USERPROFILE\\.dotnet\\tools"
+
+      # 1. Визначаємо шляхи
+      $dotnetPath = "$env:USERPROFILE\.dotnet"
+      $dotnetToolsPath = "$env:USERPROFILE\.dotnet\tools"
+
+      # 2. Встановлюємо PATH для ПОТОЧНОЇ сесії
+      $env:PATH = "$env:PATH;$dotnetPath;$dotnetToolsPath"
+
+      # 3. Встановлюємо PATH НАЗАВЖДИ для користувача 'vagrant'
+      $oldPath = [System.Environment]::GetEnvironmentVariable('PATH', 'User')
+      # Перевіряємо, чи шлях вже не додано
+      if ($oldPath -notlike "*$dotnetPath*") {
+          $newPath = "$oldPath;$dotnetPath;$dotnetToolsPath"
+          [System.Environment]::SetEnvironmentVariable('PATH', $newPath, 'User')
+          Write-Host "Dotnet PATH added to user environment."
+      } else {
+          Write-Host "Dotnet PATH already exists in user environment."
+      }
 
       Write-Host "--- Налаштування приватного BaGet репозиторію ---"
       dotnet nuget add source "http://192.168.33.1:5555/v3/index.json" -n "MyBaGet"
-      
+
       Write-Host "--- Встановлення EduCloud-v42 з BaGet ---"
-      dotnet tool install --global EduCloud-v42 --version 1.0.0-lab2
-      
+      dotnet tool install --global EduCloud-v42 --version 1.0.2-lab2
+
       Write-Host "--- Встановлення завершено! ---"
     PSHELL
   end
