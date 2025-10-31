@@ -29,7 +29,7 @@ Vagrant.configure("2") do |config|
       /home/vagrant/.dotnet/dotnet nuget add source "http://192.168.33.1:5555/v3/index.json" -n "MyBaGet"
 
       echo "--- Встановлення EduCloud-v42 з BaGet ---"
-      /home/vagrant/.dotnet/dotnet tool install --global EduCloud-v42 --version 1.0.2-lab2
+      /home/vagrant/.dotnet/dotnet tool install --global EduCloud-v42 --version 1.0.3-lab2
       
       echo "--- Встановлення завершено! ---"
     SHELL
@@ -73,7 +73,7 @@ Vagrant.configure("2") do |config|
       dotnet nuget add source "http://192.168.33.1:5555/v3/index.json" -n "MyBaGet"
 
       Write-Host "--- Встановлення EduCloud-v42 з BaGet ---"
-      dotnet tool install --global EduCloud-v42 --version 1.0.2-lab2
+      dotnet tool install --global EduCloud-v42 --version 1.0.3-lab2
 
       Write-Host "--- Встановлення завершено! ---"
     PSHELL
