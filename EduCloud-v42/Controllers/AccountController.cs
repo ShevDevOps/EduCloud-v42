@@ -99,10 +99,8 @@ namespace EduCloud_v42.Controllers
             }
             return View(model);
         }
-
-        // POST: /Account/Logout
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+        // GET: /Account/Logout
+        [HttpGet]
         public async Task<IActionResult> Logout()
         {
             await _loginer.logout(HttpContext);
