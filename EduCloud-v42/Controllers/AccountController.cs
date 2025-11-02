@@ -107,6 +107,23 @@ namespace EduCloud_v42.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+
+        public async Task<IActionResult> Profile(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var User = await _context.Users.FirstOrDefaultAsync(m => m.ID == id);
+            if (User == null)
+            {
+                return NotFound();
+            }
+
+            return View("Index", User);
+        }
+
         // Простий метод хешування паролю. У реальному проекті використовуйте надійніші бібліотеки.
         private string HashPassword(string password)
         {
