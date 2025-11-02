@@ -2,7 +2,7 @@
 
 @{
     ViewData["Title"] = "Create Element";
-    var courseId = ViewData["CourseId"];
+    var courseId = ViewData["courseId"];
 }
 
 <h1>Create Element</h1>
@@ -13,7 +13,7 @@
         <form asp-action="Create" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-            <input type="hidden" asp-for="CourseId" value="@courseId"/>
+            <input type="hidden" asp-for="CourseId" value="@courseId" />
 
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
