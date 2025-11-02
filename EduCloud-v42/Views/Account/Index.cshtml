@@ -42,10 +42,8 @@
 </div>
 <h3>Ваші курси:</h3>
 <ul>
-    @foreach (var el in Model.UserCourses)
+    @foreach (var course in (List<Course>)ViewBag.SubscribedCourses)
     {
-        <li>
-            @el.Course.Name |<a asp-controller="Course" asp-action="Details" asp-route-id="@el.CourseId">Details</a>|
-        </li>
+        <li>@course.Name</li>
     }
 </ul>
