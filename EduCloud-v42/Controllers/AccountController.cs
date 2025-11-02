@@ -7,6 +7,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Google.Apis.Auth;
 
 namespace EduCloud_v42.Controllers
 {
@@ -99,6 +100,37 @@ namespace EduCloud_v42.Controllers
             }
             return View(model);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginDto model)
+        {
+            var payload = await GoogleJsonWebSignature.ValidateAsync(model.Token);
+
+            // payload.Email, payload.Name, payload.Subject (Google ID)
+            // Перевіряємо, чи користувач вже є в БД
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == payload.Email);
+
+            if (user == null)
+            {
+                // Створюємо нового користувача
+                user = new User
+                {
+                    Email = payload.Email,
+                    FullName = payload.Name,
+                    Username = payload.Email.Split('@')[0],
+                    Role = UserRole.User,
+                    PasswordHash = "" // або якийсь випадковий
+                };
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
+            }
+
+            // Логін користувача через твій CookieLoginer
+            await _loginer.login(HttpContext, user);
+
+            return Ok(new { success = true });
+        }
+
         // GET: /Account/Logout
         [HttpGet]
         public async Task<IActionResult> Logout()
