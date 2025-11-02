@@ -7,6 +7,14 @@
     <RootNamespace>EduCloud_v42</RootNamespace>
 	  <PreserveCompilationContext>true</PreserveCompilationContext>
 	  <CopyRefAssembliesToPublishDirectory>true</CopyRefAssembliesToPublishDirectory>
+
+	  <PackAsTool>true</PackAsTool>
+	  <ToolCommandName>educloud</ToolCommandName>
+	  <PackageVersion>1.0.3-lab2</PackageVersion>
+
+	  <IsPackable>true</IsPackable>
+
+	  <IncludeStaticWebAssetsInTool>true</IncludeStaticWebAssetsInTool>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,5 +24,5 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-
+	
 </Project>

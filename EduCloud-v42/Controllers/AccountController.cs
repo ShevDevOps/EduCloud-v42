@@ -99,15 +99,66 @@ namespace EduCloud_v42.Controllers
             }
             return View(model);
         }
-
-        // POST: /Account/Logout
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+        // GET: /Account/Logout
+        [HttpGet]
         public async Task<IActionResult> Logout()
         {
             await _loginer.logout(HttpContext);
             return RedirectToAction("Index", "Home");
         }
+
+        public async Task<IActionResult> Profile(int? id)
+        {
+            if (id == null)
+                return NotFound();
+
+            // Завантажуємо користувача разом з UserCourses та Course
+            var user = await _context.Users
+                .Include(u => u.UserCourses)          // підвантажуємо зв’язок
+                    .ThenInclude(uc => uc.Course)     // підвантажуємо курси
+                .FirstOrDefaultAsync(u => u.ID == id);
+
+            if (user == null)
+                return NotFound();
+
+            // Отримуємо список курсів користувача
+            var courses = user.UserCourses.Select(uc => uc.Course).ToList();
+
+            // Передаємо у View через ViewModel або ViewBag
+            ViewBag.SubscribedCourses = courses;
+
+            return View("Index", user);
+        }
+
+        public async Task<IActionResult> Subscribe(int? CourseId, int? UserId)
+        {
+            if (CourseId == null || UserId == null)
+                return NotFound();
+
+            // Перевіряємо, чи вже є підписка
+            bool alreadySubscribed = await _context.UserCourses
+                .AnyAsync(uc => uc.UserId == UserId.Value && uc.CourseId == CourseId.Value);
+
+            if (alreadySubscribed)
+            {
+                // Можна повернути повідомлення або редірект
+                TempData["Message"] = "Ви вже підписані на цей курс.";
+                return RedirectToAction("Details", "Courses", new { id = CourseId });
+            }
+
+            var userCourse = new UserCourse
+            {
+                CourseId = CourseId.Value,
+                UserId = UserId.Value,
+                Role = CourseRole.Student
+            };
+
+            _context.UserCourses.Add(userCourse);  // додаємо в контекст
+            await _context.SaveChangesAsync();      // зберігаємо в БД
+
+            return RedirectToAction("Profile", "Account", new { id = UserId });
+        }
+
 
         // Простий метод хешування паролю. У реальному проекті використовуйте надійніші бібліотеки.
         private string HashPassword(string password)
