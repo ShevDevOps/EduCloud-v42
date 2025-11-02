@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="google-signin-client_id" content="346655435267-m45k5kj1n9h5oian7p0jmj9m9ajo62e6.apps.googleusercontent.com">
     <title>@ViewData["Title"] - EduCloud_v42</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
@@ -69,6 +70,25 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+
+    <script>
+        function onSignIn(googleUser) {
+            var profile = googleUser.getBasicProfile();
+            console.log('ID: ' + profile.getId()); // Google ID
+            console.log('Full Name: ' + profile.getName());
+            console.log('Email: ' + profile.getEmail());
+
+            // Тут можна відправити токен на бекенд
+            var id_token = googleUser.getAuthResponse().id_token;
+            fetch('/Account/GoogleLogin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: id_token })
+            }).then(r => r.json())
+              .then(console.log);
+        }
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
