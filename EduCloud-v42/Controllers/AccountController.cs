@@ -135,6 +135,17 @@ namespace EduCloud_v42.Controllers
             if (CourseId == null || UserId == null)
                 return NotFound();
 
+            // Перевіряємо, чи вже є підписка
+            bool alreadySubscribed = await _context.UserCourses
+                .AnyAsync(uc => uc.UserId == UserId.Value && uc.CourseId == CourseId.Value);
+
+            if (alreadySubscribed)
+            {
+                // Можна повернути повідомлення або редірект
+                TempData["Message"] = "Ви вже підписані на цей курс.";
+                return RedirectToAction("Details", "Courses", new { id = CourseId });
+            }
+
             var userCourse = new UserCourse
             {
                 CourseId = CourseId.Value,

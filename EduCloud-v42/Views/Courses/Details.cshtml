@@ -7,6 +7,13 @@
 
 <h1>Details Course</h1>
 
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Message"]
+    </div>
+}
+
 <div>
     <h4>@Model.Name</h4>
     <hr />
