@@ -11,6 +11,7 @@ Welcome to EduCloud-v42! This project is an ASP.NET Core web application built o
 *   **Entity Framework Core**: For object-relational mapping (ORM).
 *   **SQLite**: The database engine used for local development.
 *   **MVC (Model-View-Controller)**: The architectural pattern used for the application structure.
+*   **Google.Apis.Auth 1.72.0**: The Google APIs Client Library is a runtime client for working with Google services
 
 ## Prerequisites
 

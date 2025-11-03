@@ -123,8 +123,8 @@ namespace EduCloud_v42.Controllers
                         throw;
                     }
                 }
-                // Повертаємось до списку елементів цього ж курсу
-                return RedirectToAction(nameof(Index), new { courseId = courseElement.CourseId });
+                // Повертаємось до списку елементів цього ж курсу || Ivan: перенаправив на сторінку Details курсу
+                return RedirectToAction("Details", "Courses", new { id = courseElement.CourseId });
             }
             return View(courseElement);
         }

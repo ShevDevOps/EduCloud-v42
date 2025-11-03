@@ -1,10 +1,18 @@
 ﻿@model EduCloud_v42.Models.Course
-
+@using System.Security.Claims
 @{
     ViewData["Title"] = "Details Course";
+    var userId = User.FindFirst("id")?.Value;
 }
 
 <h1>Details Course</h1>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Message"]
+    </div>
+}
 
 <div>
     <h4>@Model.Name</h4>
@@ -28,7 +36,11 @@
     <a asp-action="Edit" asp-route-id="@Model.ID">Edit</a> |
     <a asp-action="Index">Back to list</a>|
     <a asp-action="Delete" asp-route-id="@Model.ID">Delete</a>|
-    <a asp-controller="CourseElements" asp-action="Create" asp-route-courseId="@Model.ID">Add Task</a>
+    <a asp-controller="CourseElements" asp-action="Create" asp-route-id="@Model.ID">Add Task</a>|
+    @if (User.Identity.IsAuthenticated)
+    {
+        <a asp-controller="Account" asp-action="Subscribe" asp-route-CourseId="@Model.ID" asp-route-UserId="@userId">Підписатись на курс</a>
+    }
 </div>
 <h3>Елементи курсу:</h3>
 <ul>

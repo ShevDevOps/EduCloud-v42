@@ -27,7 +27,7 @@ namespace EduCloud_v42.Models
         public UserRole Role { get; set; }
 
         // Навігаційні властивості (для зв'язків)
-        public virtual ICollection<UserCourse> UserCourses { get; set; }
-        public virtual ICollection<UserTask> UserTasks { get; set; }
+        public virtual ICollection<UserCourse> UserCourses { get; set; } = new List<UserCourse>();
+        public virtual ICollection<UserTask> UserTasks { get; set; } = new List<UserTask>();
     }
 }
