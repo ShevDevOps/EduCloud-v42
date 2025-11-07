@@ -367,3 +367,6 @@ siteData.db
 siteData.db-shm
 siteData.db-wal
 
+#Vagrant
+.vagrant/**
+
