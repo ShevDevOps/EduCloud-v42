@@ -4,6 +4,7 @@
     ViewData["Title"] = "Element Details";
     EduCloud_v42.Models.User? user = (EduCloud_v42.Models.User?)ViewBag.User;
     IEnumerable<TaskFile> taskFiles = ViewBag.taskFiles;
+    IEnumerable<UserTask> userTasks = ViewBag.userTasks;
 }
 
 <h1>Element Details</h1>
@@ -38,6 +39,12 @@
         </dd>
     </dl>
 </div>
+<div>
+    @foreach(CourseFile file in Model.CourseFiles)
+    {
+        <a href="@file.Path" download="@file.Name">@file.Name</a>
+    }
+</div>
 @if (user != null && 
      user.UserCourses.Any(uc => uc.CourseId == Model.CourseId && uc.Role == CourseRole.Student))
     {
@@ -58,8 +65,34 @@
                 {
                     <a href="@file.Path" download="@file.Name">@file.Name</a>
                 }
+                <form asp-controller="CourseElements" asp-action="Unsubmit" method="post">
+                    <input name="elementID" type="hidden" value="@Model.ID"/>
+                    <input type="submit" value="Unsubmit"/>
+                </form>
             </div>
         }
+    }
+    else if(user != null && 
+     user.UserCourses.Any(uc => uc.CourseId == Model.CourseId && uc.Role == CourseRole.Teacher))
+    {
+        <div>
+            @foreach(UserTask task in userTasks)
+            {
+                <div>
+                    <h3>@task.User.FullName</h3>
+                    @foreach(TaskFile file in task.TaskFiles)
+                    {
+                        <a href="@file.Path" download="@file.Name">@file.Name</a>
+                    }
+                    <form asp-controller="CourseElements" asp-action="Mark">
+                        <input name="elementID" type="hidden" value="@Model.ID"/>
+                        <input name="userID" type="hidden" value="@task.UserId"/>
+                        <input name="mark" value="@task.Mark" placeholder="Mark"/>
+                        <input type="submit" value="Return"/>
+                    </form>
+                </div>
+            }
+        </div>
 
     }
 <div>

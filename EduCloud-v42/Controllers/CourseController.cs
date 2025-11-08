@@ -177,6 +177,7 @@ namespace EduCloud_v42.Controllers
             var course = await _context.Courses.FindAsync(id);
             if (course != null)
             {
+                _context.DeleteAllCourseFiles(course.ID);
                 _context.Courses.Remove(course);
             }
 

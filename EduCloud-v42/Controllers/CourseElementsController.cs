@@ -50,6 +50,7 @@ namespace EduCloud_v42.Controllers
 
             var courseElement = await _context.CourseElements
                 .Include(c => c.Course)
+                .Include(c => c.CourseFiles)
                 .FirstOrDefaultAsync(m => m.ID == id);
 
             if (courseElement == null)
@@ -59,6 +60,8 @@ namespace EduCloud_v42.Controllers
 
             User? user = _loginer.getUser(HttpContext);
             List<TaskFile> taskFiles = new List<TaskFile>();
+            List<UserTask> userTasks = _context.UserTasks.Where(ut => ut.TaskId == id).Include(ut => ut.TaskFiles).Include(ut => ut.User).ToList();
+
             if (user != null)
             {
                 UserTask? ut = user.UserTasks.Where(ut => ut.TaskId == id).FirstOrDefault();
@@ -68,12 +71,12 @@ namespace EduCloud_v42.Controllers
                     taskFiles = ut.TaskFiles.ToList();
                 }
             }
-            
 
 
 
             ViewBag.User = user;
             ViewBag.taskFiles = taskFiles;
+            ViewBag.userTasks = userTasks;
             return View(courseElement);
         }
 
@@ -112,6 +115,78 @@ namespace EduCloud_v42.Controllers
             return RedirectToAction("Details", new { id=elementId });
         }
 
+        [HttpPost]
+        public IActionResult Unsubmit(int elementId)
+        {
+            User? user = _loginer.getUser(HttpContext);
+
+            var courseElement = _context.CourseElements
+                .Include(c => c.Course)
+                .FirstOrDefault(m => m.ID == elementId);
+
+            if (courseElement == null)
+            {
+                return NotFound();
+            }
+
+            if (user == null)
+            {
+                return RedirectToAction("Details", new { elementId });
+            }
+
+            UserTask? ut = user.UserTasks.Where(ut => ut.TaskId == elementId).FirstOrDefault();
+            if(ut == null)
+            {
+                return RedirectToAction("Details", new { elementId });
+            }
+
+            foreach (var file in ut.TaskFiles)
+            {
+                _context.DeleteTaskFile(file.ID);
+            }
+
+            _context.UserTasks.Remove(ut);
+
+            _context.SaveChanges();
+
+            return RedirectToAction("Details", new { id = elementId });
+        }
+
+        [HttpPost]
+        public IActionResult Mark(int elementID, int userID, string mark)
+        {
+            CourseElement? courseElement = _context.CourseElements.FirstOrDefault(m => m.ID == elementID);
+            User? student = _context.Users.FirstOrDefault(u => u.ID == userID);
+            User? teacher = _loginer.getUser(HttpContext);
+
+            if(courseElement == null)
+            {
+                return RedirectToAction("Details", new { id = elementID });
+            }
+
+            if (student == null)
+            {
+                return RedirectToAction("Details", new { id = elementID });
+            }
+
+            if(teacher == null ||
+                !teacher.UserCourses.Any(uc => uc.CourseId == courseElement.CourseId))
+            {
+                return RedirectToAction("Details", new { id = elementID });
+            }
+
+            UserTask? task = _context.UserTasks.FirstOrDefault(ut => ut.UserId == userID && ut.TaskId == elementID);
+            if (task == null)
+            {
+                return RedirectToAction("Details", new { id = elementID });
+            }
+
+            task.Mark = mark;
+            _context.SaveChanges();
+
+            return RedirectToAction("Details", new { id = elementID });
+        }
+
 
         // GET: CourseElements/Create?courseId=5
         public IActionResult Create(int id)
@@ -131,12 +206,16 @@ namespace EduCloud_v42.Controllers
         // POST: CourseElements/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Name,Description,Type,CourseId")] CourseElement courseElement)
+        public async Task<IActionResult> Create([Bind("Name,Description,Type,CourseId")] CourseElement courseElement, IEnumerable<IFormFile> files)
         {
             if (ModelState.IsValid) 
             {
                 _context.Add(courseElement);
-                await _context.SaveChangesAsync();
+                _context.SaveChanges();
+                foreach (var file in files)
+                {
+                    _context.AddCourseFile(file, courseElement.ID);
+                }
                 // Повертаємось до Курсу
                 return RedirectToAction("Details", "Courses", new { id = courseElement.CourseId });
             }
@@ -153,6 +232,7 @@ namespace EduCloud_v42.Controllers
 
             var courseElement = await _context.CourseElements
                 .Include(c => c.Course)
+                .Include(c => c.CourseFiles)
                 .FirstOrDefaultAsync(m => m.ID == id);
 
 
@@ -184,26 +264,47 @@ namespace EduCloud_v42.Controllers
 
             if (ModelState.IsValid)
             {
-                try
+                CourseElement? element = _context.CourseElements.FirstOrDefault(ce => ce.ID == courseElement.ID);
+                if (element != null)
                 {
-                    _context.Update(courseElement);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!_context.CourseElements.Any(e => e.ID == courseElement.ID))
+                    try
                     {
-                        return NotFound();
+                        element.Name = courseElement.Name;
+                        element.Description = courseElement.Description;
+                        element.Type = courseElement.Type;
+                        await _context.SaveChangesAsync();
                     }
-                    else
+                    catch (DbUpdateConcurrencyException)
                     {
-                        throw;
+                        if (!_context.CourseElements.Any(e => e.ID == courseElement.ID))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
                     }
                 }
+                
                 // Повертаємось до списку елементів цього ж курсу || Ivan: перенаправив на сторінку Details курсу
                 return RedirectToAction("Details", "Courses", new { id = courseElement.CourseId });
             }
             return View(courseElement);
+        }
+
+        [HttpPost]
+        public IActionResult EditFile(int courseFileID, int elementID, IFormFile file)
+        {
+            _context.UpdateCourseFile(courseFileID, file);
+            return RedirectToAction("Edit", new { id = elementID });
+        }
+
+        [HttpPost]
+        public IActionResult RemoveFile(int courseFileID, int elementID)
+        {
+            _context.DeleteCourseFile(courseFileID);
+            return RedirectToAction("Edit", new { id = elementID });
         }
 
         // GET: CourseElements/Delete/5
@@ -242,6 +343,7 @@ namespace EduCloud_v42.Controllers
             if (courseElement != null)
             {
                 courseId = courseElement.CourseId; // Зберігаємо ID курсу для редиректу
+                _context.DeleteAllTaskFiles(courseElement.ID);
                 _context.CourseElements.Remove(courseElement);
                 await _context.SaveChangesAsync();
             }

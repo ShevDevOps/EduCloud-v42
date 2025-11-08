@@ -39,7 +39,8 @@ namespace EduCloud_v42.Models
             var courseFile = new CourseFile
             {
                 Path = relativePath,
-                CourseElementId = courseElementId
+                CourseElementId = courseElementId,
+                Name = file.FileName
             };
 
             CourseFiles.Add(courseFile);
@@ -66,6 +67,7 @@ namespace EduCloud_v42.Models
             }
 
             courseFile.Path = newRelativePath;
+            courseFile.Name = newFile.FileName;
             CourseFiles.Update(courseFile);
             SaveChanges();
 
@@ -153,6 +155,30 @@ namespace EduCloud_v42.Models
             SaveChanges();
 
             return true;
+        }
+
+        public void DeleteAllTaskFiles(int taskId)
+        {
+            List<TaskFile> taskFiles = TaskFiles.Where(tf => tf.TaskId == taskId).ToList();
+            foreach (TaskFile taskFile in taskFiles)
+            {
+                DeleteTaskFile(taskFile.ID);
+            }
+            List<CourseFile> courseFiles = CourseFiles.Where(cf => cf.CourseElementId == taskId).ToList();
+            foreach (CourseFile courseFile in courseFiles)
+            {
+                DeleteCourseFile(courseFile.ID);
+            }
+        }
+
+        public void DeleteAllCourseFiles(int courseId)
+        {
+            List<CourseElement> courseElements = CourseElements.Where(ce => ce.CourseId == courseId).Include(ce => ce.CourseFiles).ToList();
+            foreach (CourseElement item in courseElements)
+            {
+                DeleteAllTaskFiles(item.ID);
+            }
+
         }
 
         #endregion
@@ -303,11 +329,11 @@ namespace EduCloud_v42.Models
                 // Зв'язок з CourseElement (Один CourseElement має багато файлів)
                 entity.HasOne(cf => cf.CourseElement)
                       .WithMany(ce => ce.CourseFiles)
-                      .HasForeignKey("Course element") // Використовуємо ім'я з діаграми
+                      .HasForeignKey(cf => cf.CourseElementId) // Використовуємо ім'я з діаграми
                       .HasPrincipalKey(ce => ce.ID);
 
                 // Мапуємо властивість CourseElementId
-                entity.Property(e => e.CourseElementId).HasColumnName("Course element");
+                entity.Property(e => e.CourseElementId).HasColumnName("CourseElement");
             });
 
             // --- Налаштування "User to Task" (зв'язок M-M) ---
