@@ -2,6 +2,7 @@
 using EduCloud_v42.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -9,9 +10,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EduCloud_v42.Migrations
 {
     [DbContext(typeof(LearningDbContext))]
-    partial class LearningDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251108165858_file_name_added_to_course_file")]
+    partial class file_name_added_to_course_file
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.10");
@@ -71,9 +74,12 @@ namespace EduCloud_v42.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("Course element")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("CourseElementId")
                         .HasColumnType("INTEGER")
-                        .HasColumnName("CourseElement");
+                        .HasColumnName("Course element");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -86,9 +92,13 @@ namespace EduCloud_v42.Migrations
 
                     b.HasKey("ID");
 
-                    b.HasIndex("CourseElementId");
+                    b.HasIndex("Course element");
 
-                    b.ToTable("Course Files", (string)null);
+                    b.ToTable("Course Files", null, t =>
+                        {
+                            t.Property("Course element")
+                                .HasColumnName("Course element1");
+                        });
                 });
 
             modelBuilder.Entity("EduCloud_v42.Models.TaskFile", b =>
@@ -217,7 +227,7 @@ namespace EduCloud_v42.Migrations
                 {
                     b.HasOne("EduCloud_v42.Models.CourseElement", "CourseElement")
                         .WithMany("CourseFiles")
-                        .HasForeignKey("CourseElementId")
+                        .HasForeignKey("Course element")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

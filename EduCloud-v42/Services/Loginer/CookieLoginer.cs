@@ -1,6 +1,7 @@
 ﻿using EduCloud_v42.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Security.Claims;
 
@@ -33,7 +34,7 @@ namespace EduCloud_v42.Srevices.Loginer
                 return null;
             }
 
-            User? user = db.Users.Where(u => u.ID == id).FirstOrDefault();
+            User? user = db.Users.Where(u => u.ID == id).Include(u => u.UserCourses).Include(u => u.UserTasks).ThenInclude(ut => ut.TaskFiles).FirstOrDefault();
             return user;
         }
 

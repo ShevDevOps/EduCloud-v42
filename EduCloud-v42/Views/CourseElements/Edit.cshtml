@@ -33,6 +33,25 @@
                 <input type="submit" value="Save" class="btn btn-primary"/>
             </div>
         </form>
+        <div>
+            @foreach(var file in Model.CourseFiles)
+            {
+                <div>
+                    <h3>@file.Name</h3>
+                    <form asp-controller="CourseElements" asp-action="EditFile" method="post" enctype="multipart/form-data">
+                        <input name="courseFileID" type="hidden" value="@file.ID"/>
+                        <input name="elementID" type="hidden" value="@Model.ID"/>
+                        <input name="file" type="file"/>
+                        <input type="submit" value="Update"/>
+                    </form>
+                    <form asp-controller="CourseElements" asp-action="RemoveFile" method="post">
+                        <input name="courseFileID" type="hidden" value="@file.ID"/>
+                        <input name="elementID" type="hidden" value="@Model.ID"/>
+                        <input type="submit" value="Remove"/>
+                    </form>
+                </div>
+            }
+        </div>
     </div>
 </div>
 
