@@ -370,3 +370,7 @@ siteData.db-wal
 #Vagrant
 .vagrant/**
 
+#Upload directory of wwwroot
+EduCloud-v42/wwwroot/uploads
+EduCloud-v42/wwwroot/uploads/**
+

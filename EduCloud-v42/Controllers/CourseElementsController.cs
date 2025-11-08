@@ -1,21 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using EduCloud_v42.Models;
+using EduCloud_v42.Srevices.Loginer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using EduCloud_v42.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace EduCloud_v42.Controllers
 {
     public class CourseElementsController : Controller
     {
         private readonly LearningDbContext _context;
+        private readonly ILoginer _loginer;
 
-        public CourseElementsController(LearningDbContext context)
+        public CourseElementsController(LearningDbContext context, ILoginer loginer)
         {
             _context = context;
+            _loginer = loginer;
         }
 
         // GET: CourseElements?courseId=5
@@ -33,6 +36,7 @@ namespace EduCloud_v42.Controllers
             var courseElements = _context.CourseElements
                 .Where(ce => ce.CourseId == courseId);
 
+            ViewBag.User = _loginer.getUser(HttpContext);
             return View(await courseElements.ToListAsync());
         }
 
@@ -53,14 +57,74 @@ namespace EduCloud_v42.Controllers
                 return NotFound();
             }
 
+            User? user = _loginer.getUser(HttpContext);
+            List<TaskFile> taskFiles = new List<TaskFile>();
+            if (user != null)
+            {
+                UserTask? ut = user.UserTasks.Where(ut => ut.TaskId == id).FirstOrDefault();
+                
+                if(ut != null)
+                {
+                    taskFiles = ut.TaskFiles.ToList();
+                }
+            }
+            
+
+
+
+            ViewBag.User = user;
+            ViewBag.taskFiles = taskFiles;
             return View(courseElement);
         }
+
+        [HttpPost]
+        public IActionResult Submit(int elementId, IEnumerable<IFormFile> files)
+        {
+            User? user = _loginer.getUser(HttpContext);
+
+            var courseElement =  _context.CourseElements
+                .Include(c => c.Course)
+                .FirstOrDefault(m => m.ID == elementId);
+
+            if(courseElement == null)
+            {
+                return NotFound();
+            }
+
+            if (user == null || 
+                !user.UserCourses.Any(uc => uc.CourseId == courseElement.CourseId && uc.Role == CourseRole.Student) ||
+                user.UserTasks.Any(ut => ut.TaskId == elementId))
+            {
+                return RedirectToAction("Details", new { elementId });
+            }
+
+
+            _context.UserTasks.Add(new UserTask { TaskId = elementId, UserId = user.ID, Mark=""});
+
+            _context.SaveChanges();
+
+            foreach (var file in files)
+            {
+                _context.AddTaskFile(file, user.ID, elementId);
+            }
+
+
+            return RedirectToAction("Details", new { id=elementId });
+        }
+
 
         // GET: CourseElements/Create?courseId=5
         public IActionResult Create(int id)
         {
             // Передаємо CourseId у View, щоб при POST-запиті він був включений у форму
             ViewData["CourseId"] = id;
+
+            User? user = _loginer.getUser(HttpContext);
+            if (user == null || !user.UserCourses.Any(uc => uc.CourseId == id && uc.Role == CourseRole.Teacher))
+            {
+                return NotFound();
+            }
+
             return View(new CourseElement { CourseId = id });
         }
 
@@ -87,11 +151,24 @@ namespace EduCloud_v42.Controllers
                 return NotFound();
             }
 
-            var courseElement = await _context.CourseElements.FindAsync(id);
+            var courseElement = await _context.CourseElements
+                .Include(c => c.Course)
+                .FirstOrDefaultAsync(m => m.ID == id);
+
+
             if (courseElement == null)
             {
                 return NotFound();
             }
+
+            User? user = _loginer.getUser(HttpContext);
+            if (user == null || !user.UserCourses.Any(uc => uc.CourseId == courseElement.CourseId && uc.Role == CourseRole.Teacher))
+            {
+                return NotFound();
+            }
+
+
+
             return View(courseElement);
         }
 
@@ -141,6 +218,12 @@ namespace EduCloud_v42.Controllers
                 .Include(c => c.Course)
                 .FirstOrDefaultAsync(m => m.ID == id);
             if (courseElement == null)
+            {
+                return NotFound();
+            }
+
+            User? user = _loginer.getUser(HttpContext);
+            if (user == null || !user.UserCourses.Any(uc => uc.CourseId == courseElement.CourseId && uc.Role == CourseRole.Teacher))
             {
                 return NotFound();
             }

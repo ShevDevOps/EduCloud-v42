@@ -2,6 +2,8 @@
 
 @{
     ViewData["Title"] = "Element Details";
+    EduCloud_v42.Models.User? user = (EduCloud_v42.Models.User?)ViewBag.User;
+    IEnumerable<TaskFile> taskFiles = ViewBag.taskFiles;
 }
 
 <h1>Element Details</h1>
@@ -36,7 +38,34 @@
         </dd>
     </dl>
 </div>
+@if (user != null && 
+     user.UserCourses.Any(uc => uc.CourseId == Model.CourseId && uc.Role == CourseRole.Student))
+    {
+        if(!user.UserTasks.Any(ut => ut.TaskId == Model.ID))
+        {
+            <div>
+                <form asp-controller="CourseElements" asp-action="Submit" method="post" enctype="multipart/form-data">
+                    <input name="files" type="file" multiple/>
+                    <input name="elementID" type="hidden" value="@Model.ID"/>
+                    <input type="submit" value="Submit"/>
+                </form>
+            </div>
+        }
+        else
+        {
+            <div>
+                @foreach(var file in taskFiles)
+                {
+                    <a href="@file.Path" download="@file.Name">@file.Name</a>
+                }
+            </div>
+        }
+
+    }
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.ID">Edit</a> |
+    @if (user != null && user.UserCourses.Any(uc => uc.CourseId == Model.CourseId && uc.Role == CourseRole.Teacher))
+    {
+        <a asp-action="Edit" asp-route-id="@Model.ID">Edit</a>
+    }
     <a asp-controller="Courses" asp-action="Details" asp-route-id="@Model.CourseId">Back to Course</a>
 </div>

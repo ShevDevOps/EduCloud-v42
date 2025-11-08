@@ -46,7 +46,20 @@ if (assemblyDirectory != null)
         }
         else
         {
-            Console.WriteLine("[Debug] staticwebassets directory NOT found. WebRootPath will not be set.");
+
+            staticWebAssetsPath = Path.Combine(packageRoot, "wwwroot");
+            Console.WriteLine($"[Debug] Target staticwebassets path: {staticWebAssetsPath}");
+            directoryExists = Directory.Exists(staticWebAssetsPath);
+            Console.WriteLine($"[Debug] Directory.Exists check result: {directoryExists}");
+            if (directoryExists)
+            {
+                Console.WriteLine("[Debug] Setting WebRootPath to wwwroot...");
+                builder.Environment.WebRootPath = staticWebAssetsPath;
+            }
+            else
+            {
+                Console.WriteLine("[Debug] staticwebassets directory NOT found. WebRootPath will not be set.");
+            }
         }
     }
     else

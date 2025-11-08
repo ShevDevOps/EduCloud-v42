@@ -94,7 +94,7 @@ namespace EduCloud_v42.Models
 
         #region TaskFile Management (Synchronous)
 
-        public TaskFile AddTaskFile(IFormFile file, int userId, int taskId)
+        public TaskFile? AddTaskFile(IFormFile file, int userId, int taskId)
         {
             var relativePath = SaveFile(file, "task_files");
             if (string.IsNullOrEmpty(relativePath))
@@ -106,7 +106,8 @@ namespace EduCloud_v42.Models
             {
                 Path = relativePath,
                 UserId = userId,
-                TaskId = taskId
+                TaskId = taskId,
+                Name = file.FileName
             };
 
             TaskFiles.Add(taskFile);
@@ -114,7 +115,7 @@ namespace EduCloud_v42.Models
             return taskFile;
         }
 
-        public TaskFile UpdateTaskFile(int taskFileId, IFormFile newFile)
+        public TaskFile? UpdateTaskFile(int taskFileId, IFormFile newFile)
         {
             var taskFile = TaskFiles.Find(taskFileId);
             if (taskFile == null)
@@ -131,6 +132,7 @@ namespace EduCloud_v42.Models
             }
 
             taskFile.Path = newRelativePath;
+            taskFile.Name = newFile.FileName;
             TaskFiles.Update(taskFile);
             SaveChanges();
 
@@ -157,7 +159,7 @@ namespace EduCloud_v42.Models
 
         #region Private File Helpers
 
-        private string SaveFile(IFormFile file, string subfolder)
+        private string? SaveFile(IFormFile file, string subfolder)
         {
             if (file == null || file.Length == 0)
             {
@@ -181,7 +183,7 @@ namespace EduCloud_v42.Models
             }
 
             // Повертаємо відносний шлях для збереження в БД
-            return Path.Combine("uploads", subfolder, uniqueFileName).Replace('\\', '/');
+            return "/" + Path.Combine("uploads", subfolder, uniqueFileName).Replace('\\', '/');
         }
 
         private void DeleteFile(string relativePath)
