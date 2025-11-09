@@ -10,7 +10,7 @@
 <h1>Element Details</h1>
 
 <div>
-    <h4>Course Element</h4>
+    <h4>Завдання</h4>
     <hr />
     <dl class="row">
         <dt class="col-sm-2">
@@ -54,7 +54,7 @@
                 <form asp-controller="CourseElements" asp-action="Submit" method="post" enctype="multipart/form-data">
                     <input name="files" type="file" multiple/>
                     <input name="elementID" type="hidden" value="@Model.ID"/>
-                    <input type="submit" value="Submit"/>
+                    <input type="submit" value="Підтвердити"/>
                 </form>
             </div>
         }
@@ -98,7 +98,7 @@
 <div>
     @if (user != null && user.UserCourses.Any(uc => uc.CourseId == Model.CourseId && uc.Role == CourseRole.Teacher))
     {
-        <a asp-action="Edit" asp-route-id="@Model.ID">Edit</a>
+        <a asp-action="Edit" asp-route-id="@Model.ID">Змінити</a>
     }
-    <a asp-controller="Courses" asp-action="Details" asp-route-id="@Model.CourseId">Back to Course</a>
+    <a asp-controller="Courses" asp-action="Details" asp-route-id="@Model.CourseId">Повернетуся до курсів</a>
 </div>

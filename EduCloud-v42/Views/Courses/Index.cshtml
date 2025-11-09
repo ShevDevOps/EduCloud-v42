@@ -5,19 +5,19 @@
     EduCloud_v42.Models.User? user = (EduCloud_v42.Models.User?)ViewBag.User;
 }
 
-<h1>List Course</h1>
+<h1>Курси:</h1>
 
 <p>
-    <a asp-action="Create" class="btn btn-primary">Create new Course</a>
+    <a asp-action="Create" class="btn btn-primary">Створити курс</a>
 </p>
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                @Html.DisplayNameFor(model => model.Name)/Назва
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Description)
+                @Html.DisplayNameFor(model => model.Description)/Опис
             </th>
             <th></th>
         </tr>
@@ -35,11 +35,11 @@
                 <td>
                     @if(user != null && user.UserCourses.Any(uc => uc.CourseId == item.ID && uc.Role == CourseRole.Teacher))
                     {
-                         <a asp-action="Edit" asp-route-id="@item.ID">Edit</a>
-                         <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
-                         <a asp-controller="CourseElements" asp-action="Create" asp-route-id="@item.ID">Add Task</a>
+                         <a asp-action="Edit" asp-route-id="@item.ID">Змінити</a>
+                         <a asp-action="Delete" asp-route-id="@item.ID">Видалити</a>
+                         <a asp-controller="CourseElements" asp-action="Create" asp-route-id="@item.ID">Додати завдання</a>
                     }
-                    <a asp-action="Details" asp-route-id="@item.ID">Details</a>
+                    <a asp-action="Details" asp-route-id="@item.ID">Детальніше</a>
                     
                 </td>
             </tr>

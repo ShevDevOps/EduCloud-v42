@@ -44,6 +44,6 @@
 <ul>
     @foreach (var course in (List<Course>)ViewBag.SubscribedCourses)
     {
-        <li> @course.Name |<a asp-controller="Courses" asp-action="Details" asp-route-id="@course.ID">Details</a></li>
+        <li> @course.Name |<a asp-controller="Courses" asp-action="Details" asp-route-id="@course.ID">Детальніше</a></li>
     }
 </ul>
