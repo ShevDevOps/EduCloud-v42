@@ -64,10 +64,19 @@ main {
     background-color: rgba(0, 170, 255, 0.2);
 }
 
+/*червона кнопка*/
+.btn-red {
+    border-color: rgba(255, 0, 0, 0.8);
+}
+
+.btn-red:hover{
+    background-color: rgba(255, 0, 0, 0.5);
+}
+
 /*Таблиці*/
 .table {
-    margin-top:10px;
-    border-collapse: collapse; 
+    margin-top: 10px;
+    border-collapse: collapse;
     width: 100%;
 }
 
@@ -83,4 +92,26 @@ main {
 .table th {
     background-color: #f5f5f5;
     text-align: left;
+}
+
+/*Форми*/
+form{
+    display:block;
+}
+
+.form-input{
+    margin-bottom: 20px;
+}
+
+.form-input input{
+    width:100%;
+    font-size: 24px;
+    margin-top: 5px;
+}
+
+.form-link {
+    text-decoration: underline;
+}
+.form-link:hover {
+    color: cornflowerblue;
 }

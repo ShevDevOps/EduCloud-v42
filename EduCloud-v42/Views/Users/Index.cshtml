@@ -7,26 +7,26 @@
 <h1>Користувачі</h1>
 
 <button type="button" class="button-standart" onclick="location.href='@Url.Action("Create", "Users")'">
-    Створити курс
+    Створити користувача
 </button>
 
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Username)
+                @Html.DisplayNameFor(model => model.Username)/Юзернейм
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.FullName)
+                @Html.DisplayNameFor(model => model.FullName)/Повне ім'я
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Email)
+                @Html.DisplayNameFor(model => model.Email)/Електронна пошта
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Phone)
+                @Html.DisplayNameFor(model => model.Phone)/Телефон
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Role)
+                @Html.DisplayNameFor(model => model.Role)/Роль
             </th>
             <th></th>
         </tr>
@@ -51,9 +51,21 @@
                     @Html.DisplayFor(modelItem => item.Role)
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.ID">Змінити</a> |
-                    <a asp-action="Details" asp-route-id="@item.ID">Детальніше</a> |
-                    <a asp-action="Delete" asp-route-id="@item.ID">Видалити</a>
+                    <button type="button"
+                            class="button-standart"
+                            onclick="location.href='@Url.Action("Edit", "Users", new { id = item.ID })'">
+                        Змінити
+                    </button>
+                    <button type="button"
+                            class="button-standart"
+                            onclick="location.href='@Url.Action("Details", "Users", new { id = item.ID })'">
+                        Детальніше
+                    </button>
+                    <button type="button"
+                            class="button-standart btn-red"
+                            onclick="location.href='@Url.Action("Delete", "Users", new { id = item.ID })'">
+                        Видалити
+                    </button>
                 </td>
             </tr>
         }
