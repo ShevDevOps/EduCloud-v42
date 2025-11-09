@@ -4,11 +4,12 @@
     ViewData["Title"] = "Users";
 }
 
-<h1>Users</h1>
+<h1>Користувачі</h1>
 
-<p>
-    <a asp-action="Create">Створити нового користувача</a>
-</p>
+<button type="button" class="button-standart" onclick="location.href='@Url.Action("Create", "Users")'">
+    Створити курс
+</button>
+
 <table class="table">
     <thead>
         <tr>
