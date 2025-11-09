@@ -9,37 +9,39 @@
 
 <div>
     <h4>@Model.Username</h4>
-    <hr />
+    <hr>
     <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Username)
+        <dt class="column-name">
+            @Html.DisplayNameFor(model => model.Username)/Юзернейм
         </dt>
-        <dd class="col-sm-10">
+        <dd class="column-value">
             @Html.DisplayFor(model => model.Username)
         </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.FullName)
+        <dt class="column-name">
+            @Html.DisplayNameFor(model => model.FullName)/Повне ім'я
         </dt>
-        <dd class="col-sm-10">
+        <dd class="column-value">
             @Html.DisplayFor(model => model.FullName)
         </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Email)
+        <dt class="column-name">
+            @Html.DisplayNameFor(model => model.Email)/Електронна пошта
         </dt>
-        <dd class="col-sm-10">
+        <dd class="column-value">
             @Html.DisplayFor(model => model.Email)
         </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Phone)
+        <dt class="column-name">
+            @Html.DisplayNameFor(model => model.Phone)/Телефон
         </dt>
-        <dd class="col-sm-10">
+        <dd class="column-value">
             @Html.DisplayFor(model => model.Phone)
         </dd>
     </dl>
 </div>
-<div>
-    <a asp-controller="Courses" asp-action="Index">Переглянути курси</a>
-</div>
+<button type="button"
+        class="button-standart"
+        onclick="location.href='@Url.Action("Index", "Courses")'">
+        Переглянути курси
+</button>
 <h3>Ваші курси:</h3>
 <ul>
     @foreach (var course in (List<Course>)ViewBag.SubscribedCourses)

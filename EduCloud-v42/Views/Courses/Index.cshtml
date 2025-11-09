@@ -36,9 +36,21 @@
                 <td>
                     @if(user != null && user.UserCourses.Any(uc => uc.CourseId == item.ID && uc.Role == CourseRole.Teacher))
                     {
-                         <a asp-action="Edit" asp-route-id="@item.ID">Змінити</a>
-                         <a asp-action="Delete" asp-route-id="@item.ID">Видалити</a>
-                         <a asp-controller="CourseElements" asp-action="Create" asp-route-id="@item.ID">Додати завдання</a>
+                        <button type="button"
+                                class="button-standart btn-red"
+                                onclick="location.href='@Url.Action("Delete", "Courses", new { id = item.ID })'">
+                            Видалити
+                        </button>
+                        <button type="button"
+                                class="button-standart"
+                                onclick="location.href='@Url.Action("Edit", "Courses", new { id = item.ID })'">
+                            Змінити
+                        </button>
+                        <button type="button"
+                                class="button-standart"
+                                onclick="location.href='@Url.Action("Create", "CourseElements", new { id = item.ID })'">
+                            Додати завдання
+                        </button>
                     }
                     <button type="button"
                             class="button-standart"

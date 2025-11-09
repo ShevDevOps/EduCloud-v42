@@ -97,6 +97,7 @@ main {
 /*Форми*/
 form{
     display:block;
+    margin-bottom: 20px;
 }
 
 .form-input{
@@ -109,9 +110,17 @@ form{
     margin-top: 5px;
 }
 
+.form-input textarea{
+    font-size: 24px;
+    width: 100%;
+    height: auto;
+    resize: none;
+}
+
 .form-link {
     text-decoration: underline;
 }
 .form-link:hover {
     color: cornflowerblue;
 }
+
