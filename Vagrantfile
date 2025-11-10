@@ -47,35 +47,44 @@ Vagrant.configure("2") do |config|
     windows.vm.network "forwarded_port", guest: 5000, host: 5001
 
     windows.vm.provision "shell", inline: <<-PSHELL
-      Write-Host "--- Встановлення .NET 8 SDK на Windows ---"
+      Write-Host "--- Installing .NET 8 SDK on Windows ---"
       Invoke-WebRequest -Uri https://dot.net/v1/dotnet-install.ps1 -OutFile .\\dotnet-install.ps1
       .\\dotnet-install.ps1 -Channel 8.0
 
       # 1. Визначаємо шляхи
-      $dotnetPath = "$env:USERPROFILE\.dotnet"
-      $dotnetToolsPath = "$env:USERPROFILE\.dotnet\tools"
+	  $dotnetPath = "$env:USERPROFILE\\AppData\\Local\\Microsoft\\dotnet"
+      $dotnetToolsPath = "$env:USERPROFILE\\.dotnet\\tools"
 
       # 2. Встановлюємо PATH для ПОТОЧНОЇ сесії
       $env:PATH = "$env:PATH;$dotnetPath;$dotnetToolsPath"
 
       # 3. Встановлюємо PATH НАЗАВЖДИ для користувача 'vagrant'
-      $oldPath = [System.Environment]::GetEnvironmentVariable('PATH', 'User')
+      $oldPath = [System.Environment]::GetEnvironmentVariable('PATH', 'Machine')
       # Перевіряємо, чи шлях вже не додано
       if ($oldPath -notlike "*$dotnetPath*") {
           $newPath = "$oldPath;$dotnetPath;$dotnetToolsPath"
-          [System.Environment]::SetEnvironmentVariable('PATH', $newPath, 'User')
+          [System.Environment]::SetEnvironmentVariable('PATH', $newPath, 'Machine')
           Write-Host "Dotnet PATH added to user environment."
       } else {
           Write-Host "Dotnet PATH already exists in user environment."
       }
+	  
+	  cd $env:USERPROFILE\\.dotnet\\tools
+	  echo "Set-NetFirewallProfile -Profile Domain, Public, Private -Enabled False`
+	  `$env:ASPNETCORE_URLS = 'http://0.0.0.0:5000'`
+	  `$env:PATH = [System.Environment]::GetEnvironmentVariable('Path','Machine')`
+	  cd $env:USERPROFILE\\.dotnet\\tools\\.store\\educloud-v42\\1.0.3-lab2\\educloud-v42\\1.0.3-lab2\\tools\\net8.0\\any`
+	  dotnet EduCloud-v42.dll" > educloudMain.ps1
+	  
+	  Set-Content -Encoding utf8 "powershell.exe -File C:\\Users\\vagrant\\.dotnet\\tools\\educloudMain.ps1" -Path educloud.cmd
 
-      Write-Host "--- Налаштування приватного BaGet репозиторію ---"
+      Write-Host "--- Configuring private BaGet repository ---"
       dotnet nuget add source "http://192.168.33.1:5555/v3/index.json" -n "MyBaGet"
 
-      Write-Host "--- Встановлення EduCloud-v42 з BaGet ---"
+      Write-Host "--- Installing EduCloud-v42 from BaGet ---"
       dotnet tool install --global EduCloud-v42 --version 1.0.3-lab2
 
-      Write-Host "--- Встановлення завершено! ---"
+      Write-Host "--- Installing complete! ---"
     PSHELL
   end
 end
