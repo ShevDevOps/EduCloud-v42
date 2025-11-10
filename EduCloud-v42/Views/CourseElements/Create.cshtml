@@ -5,33 +5,33 @@
     var courseId = ViewData["courseId"];
 }
 
-<h1>Create Element</h1>
+<h1>Створити завдання</h1>
 
 <hr />
-<div class="row">
-    <div class="col-md-4">
+<div>
+    <div>
         <form asp-action="Create" method="post" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <input type="hidden" asp-for="CourseId" value="@courseId" />
 
             <div class="form-input">
-                <label asp-for="Name" class="control-label"></label>
+                <label asp-for="Name" class="control-label">Назва</label>
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-input">
-                <label asp-for="Description" class="control-label"></label>
+                <label asp-for="Description" class="control-label">Опис</label>
                 <textarea asp-for="Description" class="form-control"></textarea>
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
             <div class="form-input">
-                <label asp-for="Type" class="control-label"></label>
+                <label asp-for="Type" class="control-label">Тип</label>
                 <select asp-for="Type" class="form-control" asp-items="Html.GetEnumSelectList<CourseElementType>()"></select>
                 <span asp-validation-for="Type" class="text-danger"></span>
             </div>
             <input name="files" type="file" multiple/>
-            <div class="form-input mt-3">
+            <div>
                 <input type="submit" value="Створити" class="button-standart" />
             </div>
         </form>

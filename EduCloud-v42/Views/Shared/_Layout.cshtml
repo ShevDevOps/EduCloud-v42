@@ -17,10 +17,7 @@
         <a class="lable" asp-area="" asp-controller="Home" asp-action="Index">EduCloud_v42</a>
         <ul class="Page-bar">
             <li class="page-item">
-                <a class="pagelink" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-            </li>
-            <li class="page-item">
-                <a class="pagelink" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                <a class="pagelink" asp-area="" asp-controller="Home" asp-action="Index">Домашня сторінка</a>
             </li>
             <li class="page-item">
                 <a class="pagelink" asp-area="" asp-controller="Courses" asp-action="Index">Курси</a>
@@ -34,13 +31,13 @@
                     <a class="pagelink" asp-area="" asp-controller="Account" asp-action="Profile" asp-route-id="@userId">Профіль</a>
                 </li>
                 <li class="page-item">
-                    <a class="pagelink" asp-area="" asp-controller="Account" asp-action="logout">logout</a>
+                    <a class="pagelink" asp-area="" asp-controller="Account" asp-action="logout">Вийти</a>
                 </li>
             }
             else
             {
                 <li class="page-item">
-                    <a class="pagelink" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
+                    <a class="pagelink" asp-area="" asp-controller="Account" asp-action="Login">Ввійти</a>
                 </li>
             }
         </ul>
