@@ -4,7 +4,7 @@
     ViewData["Title"] = "Edit Element";
 }
 
-<h1>Edit Element</h1>
+<h1>Редагування Завдання</h1>
 
 <hr />
 <div class="row">
@@ -15,48 +15,66 @@
             <input type="hidden" asp-for="CourseId" />
 
             <div class="form-input">
-                <label asp-for="Name" class="control-label"></label>
+                <label asp-for="Name" class="control-label">Назва</label>
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-input">
-                <label asp-for="Description" class="control-label"></label>
+                <label asp-for="Description" class="control-label">Опис</label>
                 <textarea asp-for="Description" class="form-control"></textarea>
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
             <div class="form-input">
-                <label asp-for="Type" class="control-label"></label>
+                <label asp-for="Type" class="control-label">Тип</label>
                 <select asp-for="Type" class="form-control" asp-items="Html.GetEnumSelectList<CourseElementType>()"></select>
                 <span asp-validation-for="Type" class="text-danger"></span>
             </div>
             <div class="form-input mt-3">
-                <input type="submit" value="Save" class="button-standart" />
+                <input type="submit" value="Зберегти" class="button-standart" />
             </div>
         </form>
-        <div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        Назва
+                    </th>
+                    <th>
+                        Оновити
+                    </th>
+                    <th>
+                        Видалити
+                    </th>
+                </tr>
+            </thead>
             @foreach(var file in Model.CourseFiles)
             {
-                <div>
-                    <h3>@file.Name</h3>
-                    <form asp-controller="CourseElements" asp-action="EditFile" method="post" enctype="multipart/form-data">
-                        <input name="courseFileID" type="hidden" value="@file.ID"/>
-                        <input name="elementID" type="hidden" value="@Model.ID"/>
-                        <input name="file" type="file"/>
-                        <input type="submit" value="Update"/>
-                    </form>
-                    <form asp-controller="CourseElements" asp-action="RemoveFile" method="post">
-                        <input name="courseFileID" type="hidden" value="@file.ID"/>
-                        <input name="elementID" type="hidden" value="@Model.ID"/>
-                        <input type="submit" value="Remove"/>
-                    </form>
-                </div>
+                <tr>
+                    <td>@file.Name</td>
+                    <td>
+                         <form asp-controller="CourseElements" asp-action="EditFile" method="post" enctype="multipart/form-data">
+                            <input name="courseFileID" type="hidden" value="@file.ID"/>
+                            <input name="elementID" type="hidden" value="@Model.ID"/>
+                            <input name="file" type="file"/>
+                            <input class="button-standart" type="submit" value="Оновити"/>
+                        </form>
+                    </td>
+                    <td>
+                        <form asp-controller="CourseElements" asp-action="RemoveFile" method="post">
+                            <input name="courseFileID" type="hidden" value="@file.ID"/>
+                            <input name="elementID" type="hidden" value="@Model.ID"/>
+                            <input class="button-standart" type="submit" value="Видалити"/>
+                        </form>
+                    </td>
+
+                </tr>
             }
-        </div>
+        </table>
     </div>
 </div>
 
 <div>
-    <a asp-controller="Courses" asp-action="Details" asp-route-id="@Model.CourseId">Повернутися до курсу</a>
+    <a class="button-standart" asp-controller="Courses" asp-action="Details" asp-route-id="@Model.CourseId">Повернутися до курсу</a>
 </div>
 
 @section Scripts {

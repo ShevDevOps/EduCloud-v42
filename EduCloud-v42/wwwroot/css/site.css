@@ -1,5 +1,6 @@
 body {
     font-size: 24px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif
 }
 /*Хедар і його дочірні елементи*/
 header {
@@ -38,6 +39,12 @@ a {
     color: black;
 }
 
+a[download]
+{
+    text-decoration: underline;
+    color: blue;
+}
+
 /*мейн*/
 main {
     display: flex;
@@ -62,6 +69,14 @@ main {
 .button-standart:hover{
     cursor: pointer;
     background-color: rgba(0, 170, 255, 0.2);
+}
+
+a.button-standart, input[type*="submit"].button-standart
+{
+    display: inline-block;
+    box-sizing: border-box;
+    border-width: 2px;
+    border-style: solid;
 }
 
 /*червона кнопка*/

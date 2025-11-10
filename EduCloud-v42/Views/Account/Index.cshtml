@@ -9,32 +9,15 @@
 
 <div>
     <h4>@Model.Username</h4>
-    <hr>
-    <dl class="row">
-        <dt class="column-name">
-            @Html.DisplayNameFor(model => model.Username)/Юзернейм
-        </dt>
-        <dd class="column-value">
-            @Html.DisplayFor(model => model.Username)
-        </dd>
-        <dt class="column-name">
-            @Html.DisplayNameFor(model => model.FullName)/Повне ім'я
-        </dt>
-        <dd class="column-value">
-            @Html.DisplayFor(model => model.FullName)
-        </dd>
-        <dt class="column-name">
-            @Html.DisplayNameFor(model => model.Email)/Електронна пошта
-        </dt>
-        <dd class="column-value">
-            @Html.DisplayFor(model => model.Email)
-        </dd>
-        <dt class="column-name">
-            @Html.DisplayNameFor(model => model.Phone)/Телефон
-        </dt>
-        <dd class="column-value">
-            @Html.DisplayFor(model => model.Phone)
-        </dd>
+    <div>
+        <b>Ім'я</b>:@Model.FullName
+    </div>
+    <div>
+        <b>Email</b>:@Model.Email
+    </div>
+    <div>
+        <b>Телефон</b>:@Model.Phone
+    </div>
     </dl>
 </div>
 <button type="button"
@@ -43,9 +26,26 @@
         Переглянути курси
 </button>
 <h3>Ваші курси:</h3>
-<ul>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Назва
+            </th>
+            <th>
+                
+            </th>
+        </tr>
+    </thead>
     @foreach (var course in (List<Course>)ViewBag.SubscribedCourses)
     {
-        <li> @course.Name |<a asp-controller="Courses" asp-action="Details" asp-route-id="@course.ID">Детальніше</a></li>
+        <tr>
+            <td>
+                @course.Name
+            </td>
+            <td>
+                <a class="button-standart" asp-controller="Courses" asp-action="Details" asp-route-id="@course.ID">Детальніше</a>
+            </td>
+        </tr>
     }
-</ul>
+</table>

@@ -6,60 +6,76 @@
     EduCloud_v42.Models.User? user = (EduCloud_v42.Models.User?)ViewBag.User;
 }
 
-<h1>Курс</h1>
+<h1>@Model.Name</h1>
 
-@if (TempData["Message"] != null)
-{
-    <div class="alert alert-success">
-        @TempData["Message"]
-    </div>
-}
 
 <div>
-    <h4>@Model.Name</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-    </dl>
+    <p>
+        @Model.Description
+    </p>
 </div>
 <div>
 
     @if (user != null && user.UserCourses.Any(uc => uc.CourseId == Model.ID && uc.Role == CourseRole.Teacher))
     {
-        <a asp-action="Edit" asp-route-id="@Model.ID">Змінити</a> 
-        <a asp-action="Delete" asp-route-id="@Model.ID">Видалити</a>
-        <a asp-controller="CourseElements" asp-action="Create" asp-route-id="@Model.ID">Додати завдання</a>
+        <a class="button-standart" asp-action="Edit" asp-route-id="@Model.ID">Змінити</a> 
+        <a class="button-standart" asp-action="Delete" asp-route-id="@Model.ID">Видалити</a>
+        <a class="button-standart" asp-controller="CourseElements" asp-action="Create" asp-route-id="@Model.ID">Додати завдання</a>
     }
 
-	<a asp-action="Index">Повернутися до курсів</a>|
+	<a class="button-standart" asp-action="Index">Повернутися до курсів</a>|
     @if (user != null && !user.UserCourses.Any(uc => uc.CourseId == Model.ID && uc.Role == CourseRole.Teacher))
     {
-        <a asp-controller="Account" asp-action="Subscribe" asp-route-CourseId="@Model.ID" asp-route-UserId="@userId">Підписатись на курс</a>
+        <a class="button-standart" asp-controller="Account" asp-action="Subscribe" asp-route-CourseId="@Model.ID" asp-route-UserId="@userId">Підписатись на курс</a>
     }
 </div>
 <h3>Завдання:</h3>
-<ul>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Назва
+            </th>
+            <th>
+                Тип
+            </th>
+            <th>
+
+            </th>
+        </tr>
+    </thead>
     @foreach (var el in Model.CourseElements)
     {
-        <li>
-            @el.Name (@el.Type)|<a asp-controller="CourseElements" asp-action="Details" asp-route-id="@el.ID">Детальніше</a>|
-             @if (user != null && user.UserCourses.Any(uc => uc.CourseId == Model.ID && uc.Role == CourseRole.Teacher))
+        <tr>
+            <td>
+                @el.Name
+            </td>
+            @if(el.Type == CourseElementType.Task)
             {
-                <a asp-controller="CourseElements" asp-action="Edit" asp-route-id="@el.ID">Змінити</a>
-                <a asp-controller="CourseElements" asp-action="Delete" asp-route-id="@el.ID">Видалити</a>
+                <td>
+                    Завдання
+                </td>
             }
-            
-        </li>
+            else if(el.Type == CourseElementType.Lecture)
+            {
+                <td>
+                    Лекція
+                </td>
+            }
+            else
+            {
+                <td> 
+                    Помилка
+                </td>
+            }
+            <td> 
+                <a class="button-standart" asp-controller="CourseElements" asp-action="Details" asp-route-id="@el.ID">Детальніше</a>
+                @if (user != null && user.UserCourses.Any(uc => uc.CourseId == Model.ID && uc.Role == CourseRole.Teacher))
+                {
+                    <a class="button-standart" asp-controller="CourseElements" asp-action="Edit" asp-route-id="@el.ID">Змінити</a>
+                    <a class="button-standart" asp-controller="CourseElements" asp-action="Delete" asp-route-id="@el.ID">Видалити</a>
+                }
+            </td>
+        </tr>
     }
-</ul>
+</table>
