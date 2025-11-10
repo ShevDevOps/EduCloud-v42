@@ -5,19 +5,20 @@
     EduCloud_v42.Models.User? user = (EduCloud_v42.Models.User?)ViewBag.User;
 }
 
-<h1>List Course</h1>
+<h1>Курси:</h1>
 
-<p>
-    <a asp-action="Create" class="btn btn-primary">Create new Course</a>
-</p>
+<button type="button" class="button-standart" onclick="location.href='@Url.Action("Create", "Courses")'">
+    Створити курс
+</button>
+
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                @Html.DisplayNameFor(model => model.Name)/Назва
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Description)
+                @Html.DisplayNameFor(model => model.Description)/Опис
             </th>
             <th></th>
         </tr>
@@ -35,11 +36,27 @@
                 <td>
                     @if(user != null && user.UserCourses.Any(uc => uc.CourseId == item.ID && uc.Role == CourseRole.Teacher))
                     {
-                         <a asp-action="Edit" asp-route-id="@item.ID">Edit</a>
-                         <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
-                         <a asp-controller="CourseElements" asp-action="Create" asp-route-id="@item.ID">Add Task</a>
+                        <button type="button"
+                                class="button-standart btn-red"
+                                onclick="location.href='@Url.Action("Delete", "Courses", new { id = item.ID })'">
+                            Видалити
+                        </button>
+                        <button type="button"
+                                class="button-standart"
+                                onclick="location.href='@Url.Action("Edit", "Courses", new { id = item.ID })'">
+                            Змінити
+                        </button>
+                        <button type="button"
+                                class="button-standart"
+                                onclick="location.href='@Url.Action("Create", "CourseElements", new { id = item.ID })'">
+                            Додати завдання
+                        </button>
                     }
-                    <a asp-action="Details" asp-route-id="@item.ID">Details</a>
+                    <button type="button"
+                            class="button-standart"
+                            onclick="location.href='@Url.Action("Details", "Courses", new { id = item.ID })'">
+                        Детальніше
+                    </button>
                     
                 </td>
             </tr>
