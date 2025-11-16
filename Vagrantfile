@@ -69,6 +69,13 @@ Vagrant.configure("2") do |config|
           Write-Host "Dotnet PATH already exists in user environment."
       }
 	  
+
+      Write-Host "--- Configuring private BaGet repository ---"
+      dotnet nuget add source "http://192.168.33.1:5555/v3/index.json" -n "MyBaGet"
+
+      Write-Host "--- Installing EduCloud-v42 from BaGet ---"
+      dotnet tool install --global EduCloud-v42 --version 1.0.3-lab2
+
 	  cd $env:USERPROFILE\\.dotnet\\tools
 	  echo "Set-NetFirewallProfile -Profile Domain, Public, Private -Enabled False`
 	  `$env:ASPNETCORE_URLS = 'http://0.0.0.0:5000'`
@@ -77,12 +84,6 @@ Vagrant.configure("2") do |config|
 	  dotnet EduCloud-v42.dll" > educloudMain.ps1
 	  
 	  Set-Content -Encoding utf8 "powershell.exe -File C:\\Users\\vagrant\\.dotnet\\tools\\educloudMain.ps1" -Path educloud.cmd
-
-      Write-Host "--- Configuring private BaGet repository ---"
-      dotnet nuget add source "http://192.168.33.1:5555/v3/index.json" -n "MyBaGet"
-
-      Write-Host "--- Installing EduCloud-v42 from BaGet ---"
-      dotnet tool install --global EduCloud-v42 --version 1.0.3-lab2
 
       Write-Host "--- Installing complete! ---"
     PSHELL

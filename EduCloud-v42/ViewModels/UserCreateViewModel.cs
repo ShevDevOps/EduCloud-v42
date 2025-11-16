@@ -1,6 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-using EduCloud_v42.Models;
-using Microsoft.AspNetCore.Mvc;
+﻿using EduCloud_v42.Models;
+using System.ComponentModel.DataAnnotations;
 using static EduCloud_v42.Controllers.UsersController;
 
 namespace EduCloud_v42.ViewModels

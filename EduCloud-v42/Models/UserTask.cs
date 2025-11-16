@@ -1,6 +1,4 @@
-﻿using System.Formats.Tar;
-
-namespace EduCloud_v42.Models
+﻿namespace EduCloud_v42.Models
 {
     public class UserTask
     {
