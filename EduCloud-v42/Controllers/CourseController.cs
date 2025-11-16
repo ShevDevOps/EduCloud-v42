@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using EduCloud_v42.Models;
+using EduCloud_v42.Srevices.Loginer;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using EduCloud_v42.Models;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
@@ -75,7 +72,7 @@ namespace EduCloud_v42.Controllers
                     return RedirectToAction(nameof(Index));
                 }
 
-               
+
             }
 
             foreach (var modelState in ModelState.Values)

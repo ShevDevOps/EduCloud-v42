@@ -1,8 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using System.IO;
-using System;
 
 namespace EduCloud_v42.Models
 {
@@ -233,6 +229,8 @@ namespace EduCloud_v42.Models
         // Метод для конфігурування моделей (Fluent API)
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            
+
             base.OnModelCreating(modelBuilder);
 
             // --- Налаштування таблиці Users ---
@@ -245,7 +243,7 @@ namespace EduCloud_v42.Models
                 entity.Property(e => e.Username)
                       .IsRequired()
                       .HasMaxLength(50);
-                entity.HasIndex(e => e.Username) 
+                entity.HasIndex(e => e.Username)
                       .IsUnique();
 
                 // Налаштування FullName
@@ -254,7 +252,8 @@ namespace EduCloud_v42.Models
                       .HasMaxLength(500);
 
                 entity.Property(e => e.Email)
-                      .IsRequired();
+                      .IsRequired()
+                      .HasMaxLength(50);
                 entity.HasIndex(e => e.Email)
                       .IsUnique();
 

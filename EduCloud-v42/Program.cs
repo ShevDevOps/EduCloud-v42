@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
-using System;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(new WebApplicationOptions
@@ -81,8 +80,43 @@ builder.Services.AddDataProtection()
 
 // Add services to the container.
 
-string connection = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<LearningDbContext>(options => options.UseSqlite(connection));
+string? DBChoose = builder.Configuration["DB"];
+string? connection = "";
+switch (DBChoose)
+{
+    case "SqLite":
+        connection = builder.Configuration.GetConnectionString("SqliteConnection");
+        if (!string.IsNullOrEmpty(connection))
+            builder.Services.AddDbContext<LearningDbContext>(options => options.UseSqlite(connection));
+        else
+            builder.Services.AddDbContext<LearningDbContext>(options => options.UseSqlite("Data Source=siteData.db;"));
+        break;
+    case "MsSql":
+        connection = builder.Configuration.GetConnectionString("MsSqlConnection");
+        if (!string.IsNullOrEmpty(connection))
+            builder.Services.AddDbContext<LearningDbContext>(options => options.UseSqlServer(connection));
+        else
+            builder.Services.AddDbContext<LearningDbContext>(options => options.UseSqlite("Data Source=siteData.db;"));
+        break;
+    case "Postgres":
+        connection = builder.Configuration.GetConnectionString("PostgresConnection");
+        if (!string.IsNullOrEmpty(connection))
+            builder.Services.AddDbContext<LearningDbContext>(options => options.UseNpgsql(connection));
+        else
+            builder.Services.AddDbContext<LearningDbContext>(options => options.UseSqlite("Data Source=siteData.db;"));
+        break;
+    case "InMemory":
+        connection = builder.Configuration.GetConnectionString("InMemoryConnection");
+        if (!string.IsNullOrEmpty(connection))
+            builder.Services.AddDbContext<LearningDbContext>(options => options.UseInMemoryDatabase(connection));
+        else
+            builder.Services.AddDbContext<LearningDbContext>(options => options.UseSqlite("Data Source=siteData.db;"));
+        break;
+    default:
+        builder.Services.AddDbContext<LearningDbContext>(options => options.UseSqlite("Data Source=siteData.db;"));
+        break;
+}
+
 builder.Services.AddTransient<ILoginer, CookieLoginer>();
 builder.Services.AddControllersWithViews();
 
@@ -104,7 +138,14 @@ using (var scope = app.Services.CreateScope())
         var context = services.GetRequiredService<EduCloud_v42.Models.LearningDbContext>();
 
         // Öÿ êîìàíäà çàñòîñîâóº ì³ãðàö³¿ òà ñòâîðþº òàáëèö³
-        context.Database.Migrate();
+
+        //context.Database.Migrate();
+        bool dropDB = builder.Configuration.GetValue<bool>("DropDB");
+        if(dropDB)
+        {
+            context.Database.EnsureDeleted();
+        }
+        context.Database.EnsureCreated();
     }
     catch (Exception ex)
     {

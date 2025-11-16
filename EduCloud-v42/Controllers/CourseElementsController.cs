@@ -65,8 +65,8 @@ namespace EduCloud_v42.Controllers
             if (user != null)
             {
                 UserTask? ut = user.UserTasks.Where(ut => ut.TaskId == id).FirstOrDefault();
-                
-                if(ut != null)
+
+                if (ut != null)
                 {
                     taskFiles = ut.TaskFiles.ToList();
                 }
@@ -85,16 +85,16 @@ namespace EduCloud_v42.Controllers
         {
             User? user = _loginer.getUser(HttpContext);
 
-            var courseElement =  _context.CourseElements
+            var courseElement = _context.CourseElements
                 .Include(c => c.Course)
                 .FirstOrDefault(m => m.ID == elementId);
 
-            if(courseElement == null)
+            if (courseElement == null)
             {
                 return NotFound();
             }
 
-            if (user == null || 
+            if (user == null ||
                 !user.UserCourses.Any(uc => uc.CourseId == courseElement.CourseId && uc.Role == CourseRole.Student) ||
                 user.UserTasks.Any(ut => ut.TaskId == elementId))
             {
@@ -102,7 +102,7 @@ namespace EduCloud_v42.Controllers
             }
 
 
-            _context.UserTasks.Add(new UserTask { TaskId = elementId, UserId = user.ID, Mark=""});
+            _context.UserTasks.Add(new UserTask { TaskId = elementId, UserId = user.ID, Mark = "" });
 
             _context.SaveChanges();
 
@@ -112,7 +112,7 @@ namespace EduCloud_v42.Controllers
             }
 
 
-            return RedirectToAction("Details", new { id=elementId });
+            return RedirectToAction("Details", new { id = elementId });
         }
 
         [HttpPost]
@@ -135,7 +135,7 @@ namespace EduCloud_v42.Controllers
             }
 
             UserTask? ut = user.UserTasks.Where(ut => ut.TaskId == elementId).FirstOrDefault();
-            if(ut == null)
+            if (ut == null)
             {
                 return RedirectToAction("Details", new { elementId });
             }
@@ -159,7 +159,7 @@ namespace EduCloud_v42.Controllers
             User? student = _context.Users.FirstOrDefault(u => u.ID == userID);
             User? teacher = _loginer.getUser(HttpContext);
 
-            if(courseElement == null)
+            if (courseElement == null)
             {
                 return RedirectToAction("Details", new { id = elementID });
             }
@@ -169,7 +169,7 @@ namespace EduCloud_v42.Controllers
                 return RedirectToAction("Details", new { id = elementID });
             }
 
-            if(teacher == null ||
+            if (teacher == null ||
                 !teacher.UserCourses.Any(uc => uc.CourseId == courseElement.CourseId))
             {
                 return RedirectToAction("Details", new { id = elementID });
@@ -208,7 +208,7 @@ namespace EduCloud_v42.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Name,Description,Type,CourseId")] CourseElement courseElement, IEnumerable<IFormFile> files)
         {
-            if (ModelState.IsValid) 
+            if (ModelState.IsValid)
             {
                 _context.Add(courseElement);
                 _context.SaveChanges();
@@ -286,7 +286,7 @@ namespace EduCloud_v42.Controllers
                         }
                     }
                 }
-                
+
                 // Повертаємось до списку елементів цього ж курсу || Ivan: перенаправив на сторінку Details курсу
                 return RedirectToAction("Details", "Courses", new { id = courseElement.CourseId });
             }

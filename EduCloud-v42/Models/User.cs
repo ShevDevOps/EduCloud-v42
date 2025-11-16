@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace EduCloud_v42.Models
 {
@@ -19,6 +18,7 @@ namespace EduCloud_v42.Models
         public string FullName { get; set; } = string.Empty;
         [Required]
         [EmailAddress]
+        [StringLength(50)]
         public string Email { get; set; } = string.Empty;
         [Phone]
         public string? Phone { get; set; }
