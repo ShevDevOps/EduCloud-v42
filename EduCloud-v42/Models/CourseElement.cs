@@ -11,6 +11,7 @@
         public string Name { get; set; }
         public string Description { get; set; }
         public CourseElementType Type { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         // Зовнішній ключ до Course
         public int CourseId { get; set; }

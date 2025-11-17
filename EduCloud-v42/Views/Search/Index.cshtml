@@ -1,0 +1,90 @@
+﻿@model EduCloud_v42.ViewModels.SearchViewModel
+@{
+    ViewData["Title"] = "Search";
+}
+
+<h1>Комплексний Пошук</h1>
+
+<div class="row">
+    <div class="col-md-12">
+        <form asp-action="Index" method="post">
+            <div>
+                
+                <div class="form-input">
+                    <label asp-for="DateFrom" class="control-label">Дата Створення (Від)</label>
+                    <input asp-for="DateFrom" class="form-control" type="date" />
+                </div>
+                <div class="form-input">
+                    <label asp-for="DateTo" class="control-label">Дата Створення (До)</label>
+                    <input asp-for="DateTo" class="form-control" type="date" />
+                </div>
+
+                <div class="form-input">
+                    <label asp-for="FileNameStartsWith" class="control-label">Ім'я файлу (початок)</label>
+                    <input asp-for="FileNameStartsWith" class="form-control" />
+                </div>
+                <div class="form-input">
+                    <label asp-for="FileNameEndsWith" class="control-label">Ім'я файлу (кінець)</label>
+                    <input asp-for="FileNameEndsWith" class="form-control" placeholder="e.g. .pdf, Report.docx" />
+                </div>
+                <div class="form-input">
+                    <label asp-for="SelectedCourseId" class="control-label">Пошук по Курсах</label>
+                    <select asp-for="SelectedCourseId" class="form-control" asp-items="Model.CourseList">
+                        <option value="">-- Виберіть Курс --</option>
+                    </select>
+                </div>
+            </div>
+            
+
+            <div class="form-group mt-3">
+                <input type="submit" value="Search" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Clear</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<hr />
+
+<h3>Результати Пошуку (@Model.Results.Count)</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Назва Елемента</th>
+            <th>Курс (JOIN 1)</th>
+            <th>Тип</th>
+            <th>Дата Створення</th>
+            <th>Прив'язані Файли (JOIN 2)</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Results)
+        {
+            <tr>
+                <td>
+                    <a asp-controller="CourseElements" asp-action="Details" asp-route-id="@item.ID">@item.Name</a>
+                </td>
+                <td>
+                    <a asp-controller="Courses" asp-action="Details" asp-route-id="@item.CourseId">@item.Course.Name</a>
+                </td>
+                <td>@item.Type</td>
+                <td>@item.CreatedAt.ToShortDateString()</td>
+                <td>
+                    @if (item.CourseFiles.Any())
+                    {
+                        @foreach (var file in item.CourseFiles)
+                        {
+                            // Тепер просто використовуємо поле Name
+                            <div>@file.Name</div>
+                        }
+                    }
+                    else
+                    {
+                        <span class="text-muted">N/A</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

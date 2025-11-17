@@ -25,6 +25,9 @@
             <li class="page-item">
                 <a class="pagelink" asp-area="" asp-controller="Users" asp-action="Index">Користувачі</a>
             </li>
+            <li class="page-item">
+                <a class="pagelink" asp-area="" asp-controller="Search" asp-action="Index">Пошук завдань</a>
+            </li>
             @if (User.Identity.IsAuthenticated)
             {
                 <li class="page-item">
