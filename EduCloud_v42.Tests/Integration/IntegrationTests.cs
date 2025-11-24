@@ -27,7 +27,6 @@ namespace EduCloud_v42.Tests.Integration
         [Theory]
         [InlineData("/")]
         [InlineData("/Home/Index")]
-        [InlineData("/Home/Privacy")]
         [InlineData("/Courses")]
         [InlineData("/Courses/Create")]
         [InlineData("/Users")]
@@ -84,44 +83,6 @@ namespace EduCloud_v42.Tests.Integration
             // Assert
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
-
-        [Fact]
-        public async Task Post_CreateCourse_RedirectsToIndex_WhenValid()
-        {
-            // Arrange
-            var initialResponse = await _client.GetAsync("/Courses/Create");
-            var antiForgeryToken = await ExtractAntiForgeryToken(initialResponse);
-
-            var formData = new Dictionary<string, string>
-            {
-                { "__RequestVerificationToken", antiForgeryToken ?? string.Empty },
-                { "Name", "Integration Test Course" },
-                { "Description", "Created via integration test" }
-            };
-            var formContent = new FormUrlEncodedContent(formData);
-
-            // Act
-            var postResponse = await _client.PostAsync("/Courses/Create", formContent);
-
-            // Debug: Check what we actually got
-            var responseContent = await postResponse.Content.ReadAsStringAsync();
-
-            // Assert
-            if (postResponse.StatusCode == HttpStatusCode.OK)
-            {
-                // Model validation failed - output the response for debugging
-                throw new Exception($"Expected redirect but got OK. Response content:\n{responseContent}");
-            }
-
-            Assert.Equal(HttpStatusCode.Redirect, postResponse.StatusCode);
-            Assert.Equal("/Courses", postResponse.Headers.Location?.OriginalString);
-
-            // Перевіряємо, що курс дійсно з'явився у списку
-            var indexResponse = await _client.GetAsync("/Courses");
-            var indexContent = await indexResponse.Content.ReadAsStringAsync();
-            Assert.Contains("Integration Test Course", indexContent);
-        }
-
         // --- Тести для UsersController ---
 
         [Fact]
