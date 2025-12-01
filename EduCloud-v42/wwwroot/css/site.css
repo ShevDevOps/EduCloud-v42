@@ -1,22 +1,141 @@
-html {
-  font-size: 14px;
-}
-
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-  position: relative;
-  min-height: 100%;
-}
-
 body {
-  margin-bottom: 60px;
+    font-size: 24px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif
 }
+/*Хедар і його дочірні елементи*/
+header {
+    position: fixed;
+    display: flex;
+    text-align: center;
+    align-items: center;
+    background-color: #f8fafd;
+    width: 100%;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 10px;
+}
+
+.lable {
+    position: absolute;
+    left: 10px;
+    top: 5px;
+    font-size: 36px;
+}
+
+.Page-bar {
+    display: flex;
+    list-style: none;
+    margin: auto;
+    padding: 0;
+}
+
+    .Page-bar li:not(:first-child) {
+        margin-left: 15px;
+    }
+
+a {
+    text-decoration: none;
+    color: black;
+}
+
+a[download]
+{
+    text-decoration: underline;
+    color: blue;
+}
+
+/*мейн*/
+main {
+    display: flex;
+    flex-direction: column;
+    margin-top: 65px;
+    margin-bottom: 30px;
+    justify-content: center;
+    align-items: center;
+}
+
+/*КНОПКИ*/
+
+/*стандартна кнопка*/
+.button-standart{
+    border-radius: 10px;
+    border-color: blue;
+    background-color: transparent;
+    font-size: 24px;
+    padding: 5px;
+}
+
+.button-standart:hover{
+    cursor: pointer;
+    background-color: rgba(0, 170, 255, 0.2);
+}
+
+a.button-standart, input[type*="submit"].button-standart
+{
+    display: inline-block;
+    box-sizing: border-box;
+    border-width: 2px;
+    border-style: solid;
+}
+
+/*червона кнопка*/
+.btn-red {
+    border-color: rgba(255, 0, 0, 0.8);
+}
+
+.btn-red:hover{
+    background-color: rgba(255, 0, 0, 0.5);
+}
+
+/*Таблиці*/
+.table {
+    margin-top: 10px;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.table th, .table td {
+    padding: 12px 20px; 
+    border-right: 2px solid #ccc;
+}
+
+.table th:last-child, .table td:last-child {
+    border-right: none;
+}
+
+.table th {
+    background-color: #f5f5f5;
+    text-align: left;
+}
+
+/*Форми*/
+form{
+    display:block;
+    margin-bottom: 20px;
+}
+
+.form-input{
+    margin-bottom: 20px;
+}
+
+.form-input input{
+    width:100%;
+    font-size: 24px;
+    margin-top: 5px;
+}
+
+.form-input textarea{
+    font-size: 24px;
+    width: 100%;
+    height: auto;
+    resize: none;
+}
+
+.form-link {
+    text-decoration: underline;
+}
+.form-link:hover {
+    color: cornflowerblue;
+}
+

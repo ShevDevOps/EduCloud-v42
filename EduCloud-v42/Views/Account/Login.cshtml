@@ -11,27 +11,43 @@
         <section>
             <form asp-action="Login" method="post">
                 <h4>Використовуйте локальний акаунт для входу.</h4>
-                <hr />
+                <hr>
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <div class="form-group mb-3">
+                <div class="form-input">
                     <label asp-for="Username" class="form-label"></label>
                     <input asp-for="Username" class="form-control" />
                     <span asp-validation-for="Username" class="text-danger"></span>
                 </div>
-                <div class="form-group mb-3">
+                <div class="form-input">
                     <label asp-for="Password" class="form-label"></label>
                     <input asp-for="Password" class="form-control" />
                     <span asp-validation-for="Password" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <button type="submit" class="btn btn-primary">Увійти</button>
+                    <button type="submit" class="button-standart">Увійти</button>
                 </div>
                 <div class="form-group mt-3">
                     <p>
-                        <a asp-action="Register">Немає акаунту? Зареєструватися</a>
+                        <a class="form-link" asp-action="Register">Немає акаунту? Зареєструватися</a>
                     </p>
                 </div>
             </form>
+            <p>Або зайдіть через ваш Google</p>
+            <!--<div class="g-signin2" data-onsuccess="onSignIn"></div>-->
+            <div id="g_id_onload"
+                 data-client_id="346655435267-m45k5kj1n9h5oian7p0jmj9m9ajo62e6.apps.googleusercontent.com"
+                 data-callback="handleCredentialResponse">
+            </div>
+
+            <div class="g_id_signin"
+                 data-type="standard"
+                 data-shape="rectangular"
+                 data-theme="outline"
+                 data-text="signin_with"
+                 data-size="large"
+                 data-logo_alignment="left">
+            </div>
+                
         </section>
     </div>
 </div>

@@ -3,56 +3,106 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!--<meta name="google-signin-client_id" content="346655435267-m45k5kj1n9h5oian7p0jmj9m9ajo62e6.apps.googleusercontent.com">-->
     <title>@ViewData["Title"] - EduCloud_v42</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/EduCloud_v42.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
 <body>
+    @using System.Security.Claims
+    @{
+        var userId = User.FindFirst("id")?.Value;
+    }
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">EduCloud_v42</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Courses" asp-action="Index">Courses</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Users" asp-action="Index">Users</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
+        <a class="lable" asp-area="" asp-controller="Home" asp-action="Index">EduCloud_v42</a>
+        <ul class="Page-bar">
+            <li class="page-item">
+                <a class="pagelink" asp-area="" asp-controller="Home" asp-action="Index">Домашня сторінка</a>
+            </li>
+            <li class="page-item">
+                <a class="pagelink" asp-area="" asp-controller="Courses" asp-action="Index">Курси</a>
+            </li>
+            <li class="page-item">
+                <a class="pagelink" asp-area="" asp-controller="Users" asp-action="Index">Користувачі</a>
+            </li>
+            <li class="page-item">
+                <a class="pagelink" asp-area="" asp-controller="Search" asp-action="Index">Пошук завдань</a>
+            </li>
+            @if (User.Identity.IsAuthenticated)
+            {
+                <li class="page-item">
+                    <a class="pagelink" asp-area="" asp-controller="Account" asp-action="Profile" asp-route-id="@userId">Профіль</a>
+                </li>
+                <li class="page-item">
+                    <a class="pagelink" asp-area="" asp-controller="Account" asp-action="logout">Вийти</a>
+                </li>
+            }
+            else
+            {
+                <li class="page-item">
+                    <a class="pagelink" asp-area="" asp-controller="Account" asp-action="Login">Ввійти</a>
+                </li>
+            }
+        </ul>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+    <main>
+        @RenderBody()
+    </main>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - EduCloud_v42 - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
+    <footer>
+        &copy; 2025 - EduCloud_v42 - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <!--<script src="https://apis.google.com/js/platform.js" async defer></script>-->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <script>
+
+        /*function onSignIn(googleUser) {
+            var profile = googleUser.getBasicProfile();
+            console.log('ID: ' + profile.getId()); // Google ID
+            console.log('Full Name: ' + profile.getName());
+            console.log('Email: ' + profile.getEmail());
+
+            // Тут можна відправити токен на бекенд
+            var id_token = googleUser.getAuthResponse().id_token;
+            fetch('/Account/GoogleLogin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: id_token })
+            }).then(r => r.json())
+              .then(console.log);
+        }*/
+        function handleCredentialResponse(response) {
+            // 'response.credential' - це і є твій новий id_token (JWT)
+            console.log("ID Token: " + response.credential);
+
+            fetch('/Account/GoogleLogin', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    // Якщо ти використовуєш AntiForgeryToken, додай його сюди
+                },
+                // Ми відправляємо об'єкт, який очікує твій GoogleLoginDto
+                body: JSON.stringify({ token: response.credential })
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Якщо бекенд повернув 'Ok', перезавантажуємо сторінку
+                    // (або перенаправляємо на головну)
+                    window.location.href = '/';
+                } else {
+                    console.error('Помилка логіну через Google на бекенді.');
+                }
+            })
+            .catch(error => {
+                console.error('Помилка при відправці токену:', error);
+            });
+        }
+    </script>
+    
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

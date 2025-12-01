@@ -1,6 +1,6 @@
-using System.Diagnostics;
 using EduCloud_v42.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 
 namespace EduCloud_v42.Controllers
 {
@@ -14,11 +14,6 @@ namespace EduCloud_v42.Controllers
         }
 
         public IActionResult Index()
-        {
-            return View();
-        }
-
-        public IActionResult Privacy()
         {
             return View();
         }

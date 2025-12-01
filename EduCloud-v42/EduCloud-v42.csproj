@@ -7,14 +7,59 @@
     <RootNamespace>EduCloud_v42</RootNamespace>
 	  <PreserveCompilationContext>true</PreserveCompilationContext>
 	  <CopyRefAssembliesToPublishDirectory>true</CopyRefAssembliesToPublishDirectory>
+
+	  <PackAsTool>true</PackAsTool>
+	  <ToolCommandName>educloud</ToolCommandName>
+	  <PackageVersion>1.0.3-lab2</PackageVersion>
+
+	  <IsPackable>true</IsPackable>
+
+	  <IncludeStaticWebAssetsInTool>true</IncludeStaticWebAssetsInTool>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.10" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.10">
+    <Compile Remove="Migrations\MsSql\**" />
+    <Compile Remove="Migrations\SqLite\**" />
+    <Content Remove="Migrations\MsSql\**" />
+    <Content Remove="Migrations\SqLite\**" />
+    <EmbeddedResource Remove="Migrations\MsSql\**" />
+    <EmbeddedResource Remove="Migrations\SqLite\**" />
+    <None Remove="Migrations\MsSql\**" />
+    <None Remove="Migrations\SqLite\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.Apis.Auth" Version="1.72.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.10">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.4" />
+	<PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+	<PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.1.0" />
+	<PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.1.0" />
+	<PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.9.0-beta.2" />
+	<PackageReference Include="OpenTelemetry.Exporter.Zipkin" Version="1.9.0" />
+	<PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.9.0" />
+	<PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.9.0" />
+	<PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.9.0" />
+	<PackageReference Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="1.0.0-beta.12" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+    <Folder Include="wwwroot\uploads\" />
+    <Folder Include="wwwroot\uploads\course_files\" />
+  </ItemGroup>
+
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Exec Command="dotnet tool restore" />
+		<Exec Command="dotnet swagger tofile --output swagger.json $(OutputPath)$(AssemblyName).dll v1" ContinueOnError="true" />
+	</Target>
+
+
+	
 </Project>

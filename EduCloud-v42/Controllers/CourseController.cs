@@ -1,27 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using EduCloud_v42.Models;
+using EduCloud_v42.Srevices.Loginer;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using EduCloud_v42.Models;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using EduCloud_v42.Srevices.Loginer;
 
 namespace EduCloud_v42.Controllers
 {
     public class CoursesController : Controller
     {
         private readonly LearningDbContext _context;
+        private readonly ILoginer _loginer;
 
-        public CoursesController(LearningDbContext context)
+        public CoursesController(LearningDbContext context, ILoginer loginer)
         {
             _context = context;
+            _loginer = loginer;
         }
 
         // GET: Courses
         public async Task<IActionResult> Index()
         {
+            ViewBag.User = _loginer.getUser(HttpContext);
             return View(await _context.Courses.ToListAsync());
         }
 
@@ -42,6 +43,7 @@ namespace EduCloud_v42.Controllers
                 return NotFound();
             }
 
+            ViewBag.User = _loginer.getUser(HttpContext);
             return View(course);
         }
 
@@ -60,9 +62,17 @@ namespace EduCloud_v42.Controllers
 
             if (ModelState.IsValid)
             {
-                _context.Add(course);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                User? user = _loginer.getUser(HttpContext);
+                if (user != null)
+                {
+                    _context.Add(course);
+                    await _context.SaveChangesAsync();
+                    _context.UserCourses.Add(new UserCourse { CourseId = course.ID, UserId = user.ID, Role = CourseRole.Teacher });
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+
+
             }
 
             foreach (var modelState in ModelState.Values)
@@ -89,6 +99,13 @@ namespace EduCloud_v42.Controllers
             {
                 return NotFound();
             }
+
+            User? user = _loginer.getUser(HttpContext);
+            if (user == null || !user.UserCourses.Any(uc => uc.CourseId == id && uc.Role == CourseRole.Teacher))
+            {
+                return NotFound();
+            }
+
             return View(course);
         }
 
@@ -140,6 +157,12 @@ namespace EduCloud_v42.Controllers
                 return NotFound();
             }
 
+            User? user = _loginer.getUser(HttpContext);
+            if (user == null || !user.UserCourses.Any(uc => uc.CourseId == id && uc.Role == CourseRole.Teacher))
+            {
+                return NotFound();
+            }
+
             return View(course);
         }
 
@@ -151,6 +174,7 @@ namespace EduCloud_v42.Controllers
             var course = await _context.Courses.FindAsync(id);
             if (course != null)
             {
+                _context.DeleteAllCourseFiles(course.ID);
                 _context.Courses.Remove(course);
             }
 

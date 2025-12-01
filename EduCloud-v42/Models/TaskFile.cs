@@ -4,6 +4,7 @@
     {
         public int ID { get; set; } // PK
         public string Path { get; set; }
+        public string Name { get; set; }
 
         // Композитний зовнішній ключ до UserTask
         public int UserId { get; set; }

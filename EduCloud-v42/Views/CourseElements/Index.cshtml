@@ -4,12 +4,13 @@
     ViewData["Title"] = "Course Elements";
     var courseId = ViewData["CourseId"];
     var courseName = ViewData["CourseName"];
+    EduCloud_v42.Models.User? user = (EduCloud_v42.Models.User?)ViewBag.User;
 }
 
 <h1>Elements for Course: @courseName</h1>
 
 <p>
-    <a asp-action="Create" asp-route-courseId="@courseId">Create New Element</a>
+    <a asp-action="Create" asp-route-courseId="@courseId">Створити нове завдання</a>
 </p>
 <table class="table">
     <thead>
@@ -40,14 +41,17 @@
                     @Html.DisplayFor(modelItem => item.Type)
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
+                    @if(user != null && user.UserCourses.Any(uc => uc.CourseId == item.CourseId && uc.Role == CourseRole.Teacher))
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.ID">Змінити</a>
+                        <a asp-action="Delete" asp-route-id="@item.ID">Видалити</a>
+                    }
+                    <a asp-action="Details" asp-route-id="@item.ID">Детальніше</a>
                 </td>
             </tr>
         }
     </tbody>
 </table>
 <div>
-    <a asp-controller="Courses" asp-action="Index">Back to Courses</a>
+    <a asp-controller="Courses" asp-action="Index">Повернутися до курсів</a>
 </div>

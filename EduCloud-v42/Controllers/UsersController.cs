@@ -1,16 +1,10 @@
 ﻿using EduCloud_v42.Models;
 using EduCloud_v42.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace EduCloud_v42.Controllers
 {
@@ -217,6 +211,6 @@ namespace EduCloud_v42.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        
+
     }
 }

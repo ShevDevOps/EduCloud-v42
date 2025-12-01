@@ -1,0 +1,51 @@
+﻿@model EduCloud_v42.Models.User
+
+@{
+    
+
+}
+
+<h1>Ваш профіль</h1>
+
+<div>
+    <h4>@Model.Username</h4>
+    <div>
+        <b>Ім'я</b>:@Model.FullName
+    </div>
+    <div>
+        <b>Email</b>:@Model.Email
+    </div>
+    <div>
+        <b>Телефон</b>:@Model.Phone
+    </div>
+    </dl>
+</div>
+<button type="button"
+        class="button-standart"
+        onclick="location.href='@Url.Action("Index", "Courses")'">
+        Переглянути курси
+</button>
+<h3>Ваші курси:</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Назва
+            </th>
+            <th>
+                
+            </th>
+        </tr>
+    </thead>
+    @foreach (var course in (List<Course>)ViewBag.SubscribedCourses)
+    {
+        <tr>
+            <td>
+                @course.Name
+            </td>
+            <td>
+                <a class="button-standart" asp-controller="Courses" asp-action="Details" asp-route-id="@course.ID">Детальніше</a>
+            </td>
+        </tr>
+    }
+</table>
