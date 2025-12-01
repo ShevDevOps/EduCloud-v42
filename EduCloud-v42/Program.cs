@@ -7,6 +7,10 @@ using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.OpenApi.Models;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
+using System.Diagnostics;
 using System.Reflection;
 using System.Text.Json.Serialization;
 
@@ -15,6 +19,25 @@ var builder = WebApplication.CreateBuilder(new WebApplicationOptions
     Args = args,
     ContentRootPath = AppContext.BaseDirectory
 });
+
+const string serviceName = "EduCloud-v42";
+builder.Services.AddOpenTelemetry()
+    .ConfigureResource(resource => resource.AddService(serviceName))
+    .WithTracing(tracing => tracing
+        .AddAspNetCoreInstrumentation()
+        .AddHttpClientInstrumentation()
+        .AddEntityFrameworkCoreInstrumentation()
+        .AddZipkinExporter(options =>
+        {
+            options.Endpoint = new Uri("http://192.168.33.1:9411/api/v2/spans");
+        }))
+    .WithMetrics(metrics => metrics
+        .AddAspNetCoreInstrumentation()
+        .AddHttpClientInstrumentation() 
+        .AddPrometheusExporter());
+
+builder.Services.AddSingleton(new ActivitySource(serviceName));
+
 
 // --- ПОЧАТОК ДЕТАЛЬНОЇ ДІАГНОСТИКИ ---
 Console.WriteLine("--- Starting Static File Diagnostics ---");
@@ -160,6 +183,8 @@ var app = builder.Build();
 Console.WriteLine($"[Debug] WebRootPath after build: {app.Environment.WebRootPath}");
 
 
+
+
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
@@ -217,6 +242,34 @@ else
     app.UseStaticFiles(); // Запускаємо як було, щоб побачити оригінальну помилку
 }
 
+app.UseOpenTelemetryPrometheusScrapingEndpoint();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<LearningDbContext>();
+
+    if (!context.Users.Any())
+    {
+        Console.WriteLine("Seeding database with 1500 users...");
+        var users = new List<User>();
+        for (int i = 0; i < 1500; i++)
+        {
+            users.Add(new User
+            {
+                Email = $"user{i}@example.com",
+                PasswordHash = "Hash",
+                Role = UserRole.User,
+                FullName = $"User {i}",
+                Username = $"user_login_{i}"
+            });
+        }
+        context.Users.AddRange(users);
+        context.SaveChanges();
+        Console.WriteLine("Database seeded.");
+    }
+}
+
 app.UseRouting();
 
 app.UseAuthentication();
@@ -236,6 +289,20 @@ app.MapControllerRoute(
 
 
 app.MapControllers();
+
+app.MapGet("/long-process", async (ActivitySource activitySource) =>
+{
+    using var activity = activitySource.StartActivity("LongRunningOperation");
+    activity?.SetTag("custom.tag", "simulation"); 
+
+    await Task.Delay(2000);
+
+    activity?.AddEvent(new ActivityEvent("Halfway there"));
+    await Task.Delay(2000);
+
+    return "Process Complete";
+});
+
 
 app.Run();
 
